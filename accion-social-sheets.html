@@ -1,0 +1,1643 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Acción Social">
+<meta name="theme-color" content="#2563EB">
+<title>Acción Social — Murphy, Santa Fe</title>
+<link rel="manifest" href="#" id="manifest-link">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{font-family:'Nunito',sans-serif;background:#F4F6FA;color:#111827;height:100%;-webkit-tap-highlight-color:transparent;overflow-x:hidden}
+input,select,textarea,button{font-family:'Nunito',sans-serif}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:#E4E8F0;border-radius:4px}
+textarea{resize:vertical}
+.tap:active{opacity:.7}
+.app{max-width:480px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;background:#F4F6FA}
+/* Cards */
+.scard{background:#fff;border-radius:14px;padding:14px 16px;box-shadow:0 1px 4px rgba(0,0,0,.06);border:1px solid #E4E8F0}
+/* Bottom sheet */
+.sheet-overlay{position:fixed;inset:0;z-index:200;display:flex;flex-direction:column;justify-content:flex-end}
+.sheet-bg{background:rgba(0,0,0,.45);position:absolute;inset:0}
+.sheet-box{position:relative;background:#fff;border-radius:20px 20px 0 0;max-height:92vh;display:flex;flex-direction:column;box-shadow:0 -8px 40px rgba(0,0,0,.18)}
+.sheet-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px 12px;border-bottom:1px solid #E4E8F0}
+.sheet-body{overflow-y:auto;padding:16px 20px 36px;flex:1}
+/* Detail panel */
+.detail-panel{position:fixed;inset:0;z-index:150;background:#F4F6FA;display:flex;flex-direction:column}
+.detail-header{padding:14px 16px;display:flex;align-items:center;gap:12px;flex-shrink:0}
+.detail-body{padding:16px;flex:1;overflow-y:auto}
+/* Form fields */
+.field{display:flex;flex-direction:column;gap:5px;margin-bottom:12px}
+.field label{font-size:12px;font-weight:700;color:#6B7280}
+.field input,.field select,.field textarea{background:#F9FAFB;border:1.5px solid #E4E8F0;border-radius:10px;color:#111827;padding:10px 12px;font-size:14px;width:100%;font-family:'Nunito',sans-serif}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:#2563EB}
+/* Buttons */
+.btn{border-radius:10px;padding:10px 18px;font-size:13px;font-weight:700;display:inline-flex;align-items:center;gap:6px;cursor:pointer;border:none;font-family:'Nunito',sans-serif}
+.btn-primary{background:#2563EB;color:#fff}
+.btn-ghost{background:transparent;color:#6B7280;border:1.5px solid #E4E8F0}
+.btn-danger{background:#FEF2F2;color:#DC2626;border:1.5px solid rgba(220,38,38,.27)}
+.btn-green{background:#059669;color:#fff}
+.btn-full{width:100%;justify-content:center}
+/* Topbar */
+.topbar{background:#fff;border-bottom:1px solid #E4E8F0;padding:10px 16px 8px;position:sticky;top:0;z-index:100;flex-shrink:0}
+/* Bottom nav */
+.bottomnav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:#fff;border-top:1px solid #E4E8F0;display:flex;z-index:100}
+.bottomnav button{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:10px 2px 12px;background:transparent;border:none;color:#9CA3AF;cursor:pointer;font-family:'Nunito',sans-serif;min-width:0}
+.bottomnav button.active{color:#2563EB}
+.bottomnav button span.icon{font-size:24px;line-height:1}
+.bottomnav button span.label{font-size:9px;font-weight:500}
+.bottomnav button.active span.label{font-weight:800}
+.nav-dot{width:20px;height:3px;background:#2563EB;border-radius:3px;margin-top:1px}
+/* Badges */
+.badge{display:inline-flex;align-items:center;border-radius:20px;padding:2px 9px;font-size:11px;font-weight:700;white-space:nowrap}
+.cat-chip{color:#fff;border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700}
+/* Pill filters */
+.pill{border:none;border-radius:20px;padding:5px 14px;font-size:12px;font-weight:600;white-space:nowrap;cursor:pointer;font-family:'Nunito',sans-serif}
+.pill.active{background:#2563EB;color:#fff}
+.pill.inactive{background:#F1F5F9;color:#6B7280}
+/* Avatar */
+.avatar{border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;flex-shrink:0}
+/* Divider */
+.divider{height:1px;background:#E4E8F0;margin:10px 0}
+/* Grid 2 cols */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+/* Scroll horizontal */
+.hscroll{overflow-x:auto;display:flex;gap:6px;padding-bottom:4px}
+/* Content area */
+.content{flex:1;overflow-y:auto}
+/* Acta */
+.acta-header{background:linear-gradient(135deg,#1e3a5f,#2563EB);border-radius:14px;padding:20px;color:#fff;margin-bottom:14px}
+</style>
+</head>
+<body>
+<div id="loading-overlay" style="position:fixed;inset:0;z-index:999;background:rgba(255,255,255,.95);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px">
+  <div style="font-size:40px">🤝</div>
+  <div style="font-size:16px;font-weight:800;color:#2563EB">Acción Social Murphy</div>
+  <div style="font-size:13px;color:#6B7280">Cargando datos...</div>
+  <div style="width:40px;height:40px;border:4px solid #EFF4FF;border-top-color:#2563EB;border-radius:50%;animation:spin .8s linear infinite"></div>
+</div>
+<style>@keyframes spin{to{transform:rotate(360deg)}}</style>
+<div class="app" id="app">
+  <!-- Rendered by JS -->
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// DATOS Y CONSTANTES
+// ═══════════════════════════════════════════════════════
+const CATS = ["Vivienda","Económica","Laboral","Familiar","Salud","Educación","Trámites","Consumo problemático","Equipo de Niñez","Consultorio de Escucha Niñez","Talleres Centro de Día","Derivación a Equipo de Género","Otros"];
+const SUBCATS = {"Salud":["Análisis","Ecografía","Medicación","Ayuda Excepcional"]};
+const TIPOS_ATENCION = ["Presencial","Telefónica","Domiciliaria","Telemática"];
+const PROFS = ["Biolatto Eliana","Compagnucci Natalia","Gateu Sofía","Quinteros Anabella","Rubio María Celeste"];
+const TIPOS_REUNION = ["Reunión de equipo","Reunión interinstitucional","Capacitación","Supervisión","Otra"];
+const TIPOS_EVENTO = [{label:"Reunión",color:"#2563EB",icon:"🤝"},{label:"Visita",color:"#059669",icon:"🏠"},{label:"Trámite",color:"#D97706",icon:"📄"},{label:"Capacitación",color:"#7C3AED",icon:"📚"},{label:"Recordatorio",color:"#DC2626",icon:"🔔"},{label:"Otro",color:"#6B7280",icon:"📌"}];
+const CAT_COLORS = {"Vivienda":"#2563EB","Económica":"#059669","Laboral":"#D97706","Familiar":"#7C3AED","Salud":"#DC2626","Educación":"#0891B2","Trámites":"#475569","Consumo problemático":"#B45309","Equipo de Niñez":"#0D9488","Consultorio de Escucha Niñez":"#0E7490","Talleres Centro de Día":"#6D28D9","Derivación a Equipo de Género":"#DB2777","Otros":"#6B7280"};
+const CIUDAD = "Murphy, Santa Fe, CP 2601";
+const MESES = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+const DIAS_CORTO = ["Dom","Lun","Mar","Mié","Jue","Vie","Sáb"];
+
+// ═══════════════════════════════════════════════════════
+// ESTADO GLOBAL
+// ═══════════════════════════════════════════════════════
+const STATE = {
+  tab: "inicio",
+  usuarios: [],
+  intervenciones: [],
+  atenciones: [],
+  reuniones: [],
+  eventos: [],
+  // UI state
+  sheet: null,
+  detail: null,
+  form: {},
+  // Usuarios
+  searchNombre: "",
+  searchDni: "",
+  // Intervenciones
+  filtCat: "",
+  // Atenciones
+  fechaAten: hoy(),
+  // Calendario
+  calYear: new Date().getFullYear(),
+  calMonth: new Date().getMonth(),
+  calVista: "mes",
+  calDia: null,
+  // Mapa
+  mapaCat: "",
+  // Legajo
+  legajoModo: "nombre",
+  legajoQuery: "",
+  legajoSel: null,
+  // Institucional
+  partNombre: "",
+  sitNombre: "",
+  sitDni: "",
+  // More menu
+  menuOpen: false,
+  // Acta view
+  actaReunion: null,
+};
+
+// ═══════════════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════════════
+function hoy(){ return new Date().toISOString().slice(0,10); }
+function fmtDate(d){ return d ? new Date(d+"T12:00").toLocaleDateString("es-ES",{day:"2-digit",month:"short",year:"numeric"}) : "—"; }
+function fmtDateL(d){ return d ? new Date(d+"T12:00").toLocaleDateString("es-ES",{day:"2-digit",month:"long",year:"numeric"}) : "—"; }
+function initials(n){ return (n||"?").split(" ").map(x=>x[0]).slice(0,2).join("").toUpperCase(); }
+function newId(arr){ return arr.length ? Math.max(...arr.map(x=>x.id))+1 : 1; }
+function tipoColor(t){ return (TIPOS_EVENTO.find(x=>x.label===t)||{color:"#6B7280"}).color; }
+function tipoIcon(t){ return (TIPOS_EVENTO.find(x=>x.label===t)||{icon:"📌"}).icon; }
+function catColor(c){ return CAT_COLORS[c]||"#6B7280"; }
+function esc(s){ return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+function setState(patch){
+  Object.assign(STATE, patch);
+  render();
+}
+
+// ═══════════════════════════════════════════════════════
+// RENDER ENGINE
+// ═══════════════════════════════════════════════════════
+function render(){
+  const app = document.getElementById("app");
+  app.innerHTML = buildApp();
+  bindEvents();
+}
+
+// ═══════════════════════════════════════════════════════
+// UI ATOMS
+// ═══════════════════════════════════════════════════════
+function Avatar(name, size=38, color="#2563EB"){
+  return `<div class="avatar" style="width:${size}px;height:${size}px;background:${color}22;border:2px solid ${color}44;font-size:${size*.36}px;color:${color}">${esc(initials(name))}</div>`;
+}
+function Badge(label, bg, color){
+  return `<span class="badge" style="background:${bg};color:${color}">${esc(label)}</span>`;
+}
+function CatChip(val){
+  return `<span class="cat-chip" style="background:${catColor(val)}">${esc(val)}</span>`;
+}
+function SCard(inner, style="", onclick=""){
+  return `<div class="scard${onclick?' tap':''}" style="${style}" ${onclick?`onclick="${onclick}"`:""}>${inner}</div>`;
+}
+function Field(label, id, type="text", value="", opts=null, required=false, placeholder="", rows=3){
+  const lbl = label ? `<label for="${id}">${esc(label)}${required?'<span style="color:#DC2626"> *</span>':''}</label>` : "";
+  let input = "";
+  if(opts){
+    input = `<select id="${id}" name="${id}"><option value="">Seleccionar…</option>${opts.map(o=>`<option value="${esc(o)}" ${value===o?"selected":""}>${esc(o)}</option>`).join("")}</select>`;
+  } else if(type==="textarea"){
+    input = `<textarea id="${id}" name="${id}" rows="${rows}" placeholder="${esc(placeholder)}">${esc(value)}</textarea>`;
+  } else {
+    input = `<input type="${type}" id="${id}" name="${id}" value="${esc(String(value||""))}" placeholder="${esc(placeholder)}">`;
+  }
+  return `<div class="field">${lbl}${input}</div>`;
+}
+function Divider(){ return `<div class="divider"></div>`; }
+
+// ═══════════════════════════════════════════════════════
+// SHEET COMPONENT
+// ═══════════════════════════════════════════════════════
+function Sheet(title, body){
+  return `<div class="sheet-overlay" id="sheet-overlay">
+    <div class="sheet-bg" onclick="closeSheet()"></div>
+    <div class="sheet-box">
+      <div class="sheet-header">
+        <h3 style="font-size:16px;font-weight:800">${esc(title)}</h3>
+        <button onclick="closeSheet()" style="background:#F4F6FA;border:none;width:32px;height:32px;border-radius:50%;font-size:18px;color:#6B7280;display:flex;align-items:center;justify-content:center;cursor:pointer">×</button>
+      </div>
+      <div class="sheet-body">${body}</div>
+    </div>
+  </div>`;
+}
+function closeSheet(){ setState({sheet:null,form:{},partNombre:"",sitNombre:"",sitDni:""}); }
+
+// ═══════════════════════════════════════════════════════
+// TOPBAR
+// ═══════════════════════════════════════════════════════
+const LABEL = {inicio:"Inicio",usuarios:"Usuarios",intervenciones:"Intervenciones",atenciones:"Atenciones diarias",seguimiento:"Seguimiento",institucional:"Institucional",legajo:"Legajo",mapa:"Mapa territorial",calendario:"Calendario"};
+function buildTopbar(){
+  const d = new Date();
+  const dayNum = d.toLocaleDateString("es-ES",{day:"numeric"});
+  const dayName = d.toLocaleDateString("es-ES",{weekday:"long"});
+  const monthYear = d.toLocaleDateString("es-ES",{month:"long",year:"numeric"});
+  return `<div class="topbar">
+    <div style="display:flex;align-items:center;justify-content:space-between">
+      <div style="display:flex;align-items:baseline;gap:8px">
+        <span style="font-size:26px;font-weight:800;line-height:1">${dayNum}</span>
+        <div>
+          <div style="font-size:13px;font-weight:700;text-transform:capitalize">${dayName}</div>
+          <div style="font-size:11px;color:#6B7280;text-transform:capitalize">${monthYear}</div>
+        </div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:9px;font-weight:800;color:#2563EB;letter-spacing:1.5px;text-transform:uppercase">Acción Social</div>
+        <div style="font-size:13px;font-weight:800">${LABEL[STATE.tab]||""}</div>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ═══════════════════════════════════════════════════════
+// BOTTOM NAV
+// ═══════════════════════════════════════════════════════
+function buildBottomNav(){
+  if(STATE.tab==="inicio") return "";
+  const main = [{id:"usuarios",label:"Usuarios",icon:"👥"},{id:"intervenciones",label:"Interv.",icon:"📋"},{id:"atenciones",label:"Atenciones",icon:"📅"}];
+  const more = [{id:"seguimiento",label:"Seguimiento",icon:"🔍"},{id:"institucional",label:"Institucional",icon:"🏛"},{id:"mapa",label:"Mapa",icon:"🗺"},{id:"legajo",label:"Legajo",icon:"📂"},{id:"calendario",label:"Calendario",icon:"🗓"}];
+  const inMore = more.some(t=>t.id===STATE.tab);
+  let html = `<div class="bottomnav">
+    <button onclick="goTo('inicio')" class="tap">
+      <span class="icon">⊞</span><span class="label">Inicio</span>
+    </button>`;
+  main.forEach(t => {
+    const active = STATE.tab===t.id;
+    html += `<button onclick="goTo('${t.id}')" class="tap ${active?'active':''}">
+      <span class="icon" style="font-size:${active?28:24}px">${t.icon}</span>
+      <span class="label">${t.label}</span>
+      ${active?'<div class="nav-dot"></div>':''}
+    </button>`;
+  });
+  html += `<button onclick="toggleMenu()" class="tap ${inMore||STATE.menuOpen?'active':''}">
+    <span class="icon" style="font-size:${STATE.menuOpen?28:24}px">⋯</span>
+    <span class="label">Más</span>
+    ${(inMore||STATE.menuOpen)?'<div class="nav-dot"></div>':''}
+  </button></div>`;
+  // More menu
+  if(STATE.menuOpen){
+    html += `<div style="position:fixed;inset:0;z-index:99" onclick="toggleMenu()">
+      <div style="position:absolute;bottom:70px;right:8px;background:#fff;border-radius:14px;box-shadow:0 4px 24px rgba(0,0,0,.15);border:1px solid #E4E8F0;overflow:hidden;min-width:200px">
+        ${more.map(t=>`<button onclick="goTo('${t.id}')" class="tap" style="display:flex;align-items:center;gap:12px;width:100%;padding:14px 18px;background:${STATE.tab===t.id?'#EFF4FF':'transparent'};border:none;border-bottom:1px solid #E4E8F0;color:${STATE.tab===t.id?'#2563EB':'#111827'};font-weight:${STATE.tab===t.id?800:600};font-size:14px;text-align:left;cursor:pointer;font-family:Nunito,sans-serif">
+          <span style="font-size:20px">${t.icon}</span>${t.label}
+        </button>`).join("")}
+      </div>
+    </div>`;
+  }
+  return html;
+}
+function goTo(tab){ setState({tab,menuOpen:false,detail:null,sheet:null,actaReunion:null}); }
+function toggleMenu(){ setState({menuOpen:!STATE.menuOpen}); }
+
+// ═══════════════════════════════════════════════════════
+// INICIO
+// ═══════════════════════════════════════════════════════
+function buildInicio(){
+  const atenHoy = STATE.atenciones.filter(a=>a.fecha===hoy());
+  const secciones = [
+    {id:"usuarios",icon:"👥",label:"Usuarios",color:"#2563EB",val:STATE.usuarios.length,sub:"registrados"},
+    {id:"intervenciones",icon:"📋",label:"Intervenciones",color:"#059669",val:STATE.intervenciones.length,sub:"totales"},
+    {id:"atenciones",icon:"📅",label:"Atenciones",color:"#D97706",val:atenHoy.length,sub:"hoy"},
+    {id:"legajo",icon:"📂",label:"Legajo",color:"#DC2626",val:null,sub:"buscar y descargar"},
+    {id:"seguimiento",icon:"🔍",label:"Seguimiento",color:"#7C3AED",val:STATE.intervenciones.length,sub:"en curso"},
+    {id:"institucional",icon:"🏛",label:"Institucional",color:"#0891B2",val:null,sub:"reuniones"},
+    {id:"mapa",icon:"🗺",label:"Mapa",color:"#059669",val:null,sub:"territorial"},
+    {id:"calendario",icon:"🗓",label:"Calendario",color:"#DC2626",val:null,sub:"del equipo"},
+  ];
+  const minHoy = atenHoy.reduce((s,a)=>s+(Number(a.duracion)||0),0);
+  return `
+    <div style="display:flex;gap:10px;margin-bottom:16px">
+      <div style="flex:1;background:#EFF4FF;border-radius:14px;padding:12px 14px">
+        <div style="font-size:22px;font-weight:800;color:#2563EB">${atenHoy.length}</div>
+        <div style="font-size:11px;font-weight:600;color:#2563EB;opacity:.8">Atenciones hoy</div>
+      </div>
+      <div style="flex:1;background:#ECFDF5;border-radius:14px;padding:12px 14px">
+        <div style="font-size:22px;font-weight:800;color:#059669">${minHoy} min</div>
+        <div style="font-size:11px;font-weight:600;color:#059669;opacity:.8">Tiempo total</div>
+      </div>
+      <div style="flex:1;background:#F5F3FF;border-radius:14px;padding:12px 14px">
+        <div style="font-size:22px;font-weight:800;color:#7C3AED">${STATE.usuarios.length}</div>
+        <div style="font-size:11px;font-weight:600;color:#7C3AED;opacity:.8">Usuarios</div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      ${secciones.map(s=>`
+        <button onclick="goTo('${s.id}')" class="tap" style="background:#fff;border:1.5px solid #E4E8F0;border-radius:18px;padding:22px 16px;display:flex;flex-direction:column;align-items:center;gap:10px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.06)">
+          <div style="width:60px;height:60px;border-radius:16px;background:${s.color}18;display:flex;align-items:center;justify-content:center;font-size:30px">${s.icon}</div>
+          <div style="font-weight:800;font-size:14px;color:#111827">${s.label}</div>
+          <div style="background:${s.color}18;border-radius:20px;padding:3px 12px;font-size:11px;font-weight:700;color:${s.color}">${s.val!==null?`${s.val} ${s.sub}`:s.sub}</div>
+        </button>`).join("")}
+    </div>`;
+}
+
+// ═══════════════════════════════════════════════════════
+// USUARIOS
+// ═══════════════════════════════════════════════════════
+function buildUsuarios(){
+  if(STATE.detail && STATE.tab==="usuarios") return buildUsuarioDetalle();
+  const filtered = STATE.usuarios.filter(u=>{
+    const mn = !STATE.searchNombre || u.nombre.toLowerCase().includes(STATE.searchNombre.toLowerCase());
+    const md = !STATE.searchDni || (u.dni||"").includes(STATE.searchDni);
+    return mn && md;
+  });
+  return `
+    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px">
+      <div style="display:flex;gap:8px;align-items:center">
+        <div style="flex:1;position:relative">
+          <span style="position:absolute;left:11px;top:50%;transform:translateY(-50%);font-size:14px;color:#9CA3AF">👤</span>
+          <input value="${esc(STATE.searchNombre)}" oninput="setState({searchNombre:this.value})" placeholder="Buscar por nombre…"
+            style="width:100%;background:#fff;border:1.5px solid ${STATE.searchNombre?'#2563EB':'#E4E8F0'};border-radius:10px;padding:9px 12px 9px 34px;font-size:14px;color:#111827;font-family:Nunito,sans-serif">
+        </div>
+        <button onclick="openSheet('usuarioNuevo')" class="btn btn-primary tap">+ Nuevo</button>
+      </div>
+      <div style="position:relative">
+        <span style="position:absolute;left:11px;top:50%;transform:translateY(-50%);font-size:14px;color:#9CA3AF">🪪</span>
+        <input value="${esc(STATE.searchDni)}" oninput="setState({searchDni:this.value})" placeholder="Buscar por DNI…"
+          style="width:100%;background:#fff;border:1.5px solid ${STATE.searchDni?'#2563EB':'#E4E8F0'};border-radius:10px;padding:9px 12px 9px 34px;font-size:14px;color:#111827;font-family:Nunito,sans-serif">
+      </div>
+      ${(STATE.searchNombre||STATE.searchDni)?`<button onclick="setState({searchNombre:'',searchDni:''})" style="align-self:flex-start;background:none;border:none;font-size:12px;color:#6B7280;cursor:pointer;font-family:Nunito,sans-serif">✕ Limpiar búsqueda</button>`:""}
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      ${filtered.length===0?SCard('<p style="color:#9CA3AF;text-align:center;font-size:13px">Sin resultados</p>'):
+        filtered.map(u=>{
+          const nI = STATE.intervenciones.filter(i=>i.usuarioId===u.id).length;
+          return SCard(`
+            <div style="display:flex;gap:12px;align-items:center">
+              ${Avatar(u.nombre,44,"#7C3AED")}
+              <div style="flex:1;min-width:0">
+                <div style="font-weight:800;font-size:14px">${esc(u.nombre)}</div>
+                <div style="font-size:12px;color:#6B7280;margin-top:3px;display:flex;gap:12px;flex-wrap:wrap">
+                  <span>📞 ${esc(u.telefono||"—")}</span>
+                  <span>📋 ${nI} interv.</span>
+                  ${u.cud==="Sí"?Badge("♿ CUD","#F5F3FF","#7C3AED"):""}
+                </div>
+              </div>
+              <span style="color:#9CA3AF;font-size:20px">›</span>
+            </div>`, "", `openDetalle('usuario','${u.id}')`);
+        }).join("")}
+    </div>
+    ${STATE.sheet ? buildSheetUsuario() : ""}`;
+}
+
+function buildUsuarioDetalle(){
+  const u = STATE.usuarios.find(u=>u.id==STATE.detail);
+  if(!u) return "";
+  const rs = STATE.reuniones.filter(r=>(r.situaciones||[]).some(s=>s.usuarioId===u.id||(s.dni&&u.dni&&s.dni===u.dni)));
+  return `<div style="position:fixed;inset:0;z-index:150;background:#F4F6FA;display:flex;flex-direction:column">
+    <div style="background:#fff;border-bottom:1px solid #E4E8F0;padding:14px 16px;display:flex;align-items:center;gap:12px;flex-shrink:0">
+      <button onclick="setState({detail:null})" class="tap" style="background:#F4F6FA;border:none;width:36px;height:36px;border-radius:50%;font-size:22px;color:#111827;cursor:pointer">‹</button>
+      <h2 style="font-size:15px;font-weight:800;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(u.nombre)}</h2>
+    </div>
+    <div style="padding:16px;flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:14px">
+      ${SCard(`
+        <div style="display:flex;gap:14px;align-items:center;margin-bottom:14px">
+          ${Avatar(u.nombre,56,"#7C3AED")}
+          <div style="font-weight:800;font-size:16px">${esc(u.nombre)}</div>
+        </div>
+        ${Divider()}
+        ${[["DNI / NIE",u.dni||"—"],["F. Nacimiento",u.fechaNac?fmtDate(u.fechaNac):"—"],["Teléfono",u.telefono||"—"],["Email",u.email||"—"],["Alta",fmtDate(u.fechaAlta)]].map(([k,v])=>`
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;padding:8px 0;border-bottom:1px solid #E4E8F0">
+            <span style="font-size:12px;color:#6B7280;font-weight:600;flex-shrink:0;margin-right:8px">${k}</span>
+            <span style="font-size:13px;font-weight:700;text-align:right">${esc(v)}</span>
+          </div>`).join("")}
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;padding:8px 0;border-bottom:1px solid #E4E8F0">
+          <span style="font-size:12px;color:#6B7280;font-weight:600;flex-shrink:0;margin-right:8px">Dirección</span>
+          ${u.direccion?`<a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(u.direccion+', '+CIUDAD)}" target="_blank" style="font-size:13px;font-weight:700;color:#2563EB;text-decoration:none">📍 ${esc(u.direccion)} ›</a>`:`<span style="font-size:13px;font-weight:700">—</span>`}
+        </div>
+        <div style="margin-top:12px;background:${u.cud==="Sí"?"#F5F3FF":"#F3F4F6"};border-radius:10px;padding:10px 14px">
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <span style="font-size:13px;font-weight:700;color:${u.cud==="Sí"?"#7C3AED":"#6B7280"}">♿ CUD</span>
+            ${Badge(u.cud||"No",u.cud==="Sí"?"#F5F3FF":"#E5E7EB",u.cud==="Sí"?"#7C3AED":"#6B7280")}
+          </div>
+          ${u.cud==="Sí"&&!u.cudFoto?`<div style="margin-top:8px;font-size:12px;color:#9CA3AF;font-style:italic">Sin foto cargada</div>`:""}
+          ${u.cud==="Sí"&&u.cudFoto?`<img src="${u.cudFoto}" alt="CUD" style="margin-top:10px;width:100%;border-radius:8px;object-fit:contain;max-height:200px;border:1px solid #E4E8F0">`:""}
+        </div>
+        ${u.notas?`<div style="margin-top:12px;background:#FFFBEB;border-radius:10px;padding:10px 12px;font-size:13px;color:#D97706;font-weight:600">📝 ${esc(u.notas)}</div>`:""}
+      `)}
+      ${rs.length>0?`<div>
+        <div style="font-weight:800;font-size:12px;color:#6B7280;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">🏛 Reuniones institucionales (${rs.length})</div>
+        ${rs.sort((a,b)=>b.fecha.localeCompare(a.fecha)).map(r=>SCard(`
+          <div style="font-weight:700;font-size:13px;margin-bottom:4px">${esc(r.titulo)}</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            ${Badge(r.tipo,"#EFF4FF","#2563EB")}
+            ${Badge(fmtDate(r.fecha),"#F3F4F6","#6B7280")}
+          </div>
+          ${r.temas?`<p style="font-size:12px;color:#6B7280;margin-top:6px;line-height:1.4">${esc(r.temas.slice(0,80))}${r.temas.length>80?"…":""}</p>`:""}
+        `,"margin-bottom:8px;border-left:4px solid #2563EB")).join("")}
+      </div>`:""}
+      <div style="display:flex;gap:10px">
+        <button onclick="openSheet('usuarioEdit','${u.id}')" class="btn btn-primary tap" style="flex:1;justify-content:center">✏️ Editar</button>
+        <button onclick="eliminarUsuario('${u.id}')" class="btn btn-danger tap">🗑 Eliminar</button>
+      </div>
+      <button onclick="imprimirLegajo('${u.id}')" class="btn btn-green btn-full tap">📄 Descargar legajo completo</button>
+    </div>
+    ${STATE.sheet ? buildSheetUsuario() : ""}
+  </div>`;
+}
+
+function buildSheetUsuario(){
+  const f = STATE.form;
+  const tiposCud = ["Sí","No"];
+  return Sheet(f.id?"Editar usuario":"Nuevo usuario", `
+    ${Field("Nombre completo *","f_nombre","text",f.nombre||"","",true)}
+    <div class="grid2">
+      ${Field("DNI / NIE","f_dni","text",f.dni||"")}
+      ${Field("Teléfono","f_telefono","text",f.telefono||"")}
+    </div>
+    <div class="grid2">
+      ${Field("Fecha nacimiento","f_fechaNac","date",f.fechaNac||"")}
+      ${Field("Email","f_email","email",f.email||"")}
+    </div>
+    ${Field("Dirección","f_direccion","text",f.direccion||"")}
+    ${Field("Fecha alta","f_fechaAlta","date",f.fechaAlta||hoy())}
+    <div class="field">
+      <label>♿ Posee CUD</label>
+      <div style="display:flex;gap:8px">
+        ${tiposCud.map(op=>`<button onclick="setState({form:{...STATE.form,cud:'${op}'}})" class="tap"
+          style="flex:1;padding:9px;border-radius:10px;border:2px solid ${(f.cud||'No')===op?'#7C3AED':'#E4E8F0'};background:${(f.cud||'No')===op?'#F5F3FF':'#fff'};color:${(f.cud||'No')===op?'#7C3AED':'#6B7280'};font-weight:700;font-size:14px;cursor:pointer;font-family:Nunito,sans-serif">${op}</button>`).join("")}
+      </div>
+      ${(f.cud||"No")==="Sí"?`
+        <div style="margin-top:12px">
+          <label style="font-size:12px;font-weight:700;color:#6B7280;display:block;margin-bottom:8px">Foto del CUD</label>
+          ${f.cudFoto?`<div style="position:relative">
+            <img src="${f.cudFoto}" style="width:100%;border-radius:8px;object-fit:contain;max-height:180px;border:1px solid #E4E8F0">
+            <button onclick="setState({form:{...STATE.form,cudFoto:''}})" style="position:absolute;top:6px;right:6px;background:rgba(0,0,0,.5);border:none;border-radius:50%;width:28px;height:28px;color:#fff;font-size:16px;cursor:pointer">×</button>
+          </div>`:`<label style="display:flex;flex-direction:column;align-items:center;gap:6px;background:#fff;border:2px dashed #E4E8F0;border-radius:10px;padding:20px;cursor:pointer">
+            <span style="font-size:28px">📷</span>
+            <span style="font-size:12px;color:#9CA3AF;font-weight:600">Tocar para cargar foto</span>
+            <input type="file" accept="image/*" capture="environment" style="display:none" onchange="loadCudPhoto(this)">
+          </label>`}
+        </div>`:""}
+    </div>
+    ${Field("Notas","f_notas","textarea",f.notas||"")}
+    <div style="display:flex;gap:10px;padding-top:4px">
+      <button onclick="closeSheet()" class="btn btn-ghost tap" style="flex:1;justify-content:center">Cancelar</button>
+      <button onclick="guardarUsuario()" class="btn btn-primary tap" style="flex:2;justify-content:center">Guardar</button>
+    </div>`);
+}
+
+// ═══════════════════════════════════════════════════════
+// INTERVENCIONES
+// ═══════════════════════════════════════════════════════
+function buildIntervenciones(){
+  if(STATE.detail && STATE.tab==="intervenciones") return buildIntervencionDetalle();
+  const filtered = STATE.intervenciones.filter(i=>!STATE.filtCat||i.categoria===STATE.filtCat);
+  return `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <div style="font-size:13px;color:#6B7280;font-weight:600">${filtered.length} intervenciones</div>
+      <button onclick="openSheet('intervencionNueva')" class="btn btn-primary tap">+ Nueva</button>
+    </div>
+    <div class="hscroll" style="margin-bottom:14px">
+      <button onclick="setState({filtCat:''})" class="pill ${!STATE.filtCat?'active':'inactive'} tap">Todas</button>
+      ${CATS.map(c=>`<button onclick="setState({filtCat:STATE.filtCat==='${c}'?'':'${c}'})" class="pill ${STATE.filtCat===c?'active':'inactive'} tap" style="${STATE.filtCat===c?`background:${catColor(c)}`:''};">${c}</button>`).join("")}
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      ${filtered.length===0?SCard('<p style="color:#9CA3AF;text-align:center;font-size:13px">Sin resultados</p>'):
+        filtered.map(i=>{
+          const u = STATE.usuarios.find(u=>u.id===i.usuarioId);
+          const nA = STATE.atenciones.filter(a=>a.intervencionId===i.id).length;
+          return SCard(`
+            <div style="display:flex;gap:12px;align-items:flex-start">
+              <div style="width:4px;border-radius:4px;align-self:stretch;background:${catColor(i.categoria)};flex-shrink:0;min-height:50px"></div>
+              <div style="flex:1;min-width:0">
+                <div style="font-weight:800;font-size:14px;margin-bottom:5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(i.titulo)}</div>
+                <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px">
+                  ${CatChip(i.categoria)}
+                  ${i.subCategoria?Badge(i.subCategoria,"#F3F4F6","#6B7280"):""}
+                </div>
+                <div style="font-size:12px;color:#6B7280;display:flex;gap:12px">
+                  <span>👤 ${esc(u?.nombre||"—")}</span><span>📋 ${nA} aten.</span>
+                </div>
+              </div>
+              <span style="color:#9CA3AF;font-size:20px;align-self:center">›</span>
+            </div>`, "", `openDetalle('intervencion','${i.id}')`);
+        }).join("")}
+    </div>
+    ${STATE.sheet ? buildSheetIntervencion() : ""}`;
+}
+
+function buildIntervencionDetalle(){
+  const i = STATE.intervenciones.find(x=>x.id==STATE.detail);
+  if(!i) return "";
+  const u = STATE.usuarios.find(u=>u.id===i.usuarioId);
+  const ates = STATE.atenciones.filter(a=>a.intervencionId===i.id).sort((a,b)=>b.fecha.localeCompare(a.fecha));
+  return `<div style="position:fixed;inset:0;z-index:150;background:#F4F6FA;display:flex;flex-direction:column">
+    <div style="background:#fff;border-bottom:1px solid #E4E8F0;padding:14px 16px;display:flex;align-items:center;gap:12px;flex-shrink:0">
+      <button onclick="setState({detail:null})" class="tap" style="background:#F4F6FA;border:none;width:36px;height:36px;border-radius:50%;font-size:22px;color:#111827;cursor:pointer">‹</button>
+      <h2 style="font-size:15px;font-weight:800;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(i.titulo)}</h2>
+    </div>
+    <div style="padding:16px;flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:14px">
+      ${SCard(`
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+          ${CatChip(i.categoria)}
+          ${i.subCategoria?Badge(i.subCategoria,"#F3F4F6","#6B7280"):""}
+        </div>
+        ${[["Usuario",u?.nombre||"—"],["Profesional",i.profesional||"—"],["Fecha",fmtDate(i.fechaInicio)]].map(([k,v])=>`
+          <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #E4E8F0">
+            <span style="font-size:12px;color:#6B7280;font-weight:600">${k}</span>
+            <span style="font-size:13px;font-weight:700">${esc(v)}</span>
+          </div>`).join("")}
+        ${i.descripcion?`<p style="margin-top:12px;font-size:13px;line-height:1.6">${esc(i.descripcion)}</p>`:""}
+      `)}
+      <div>
+        <div style="font-weight:800;font-size:12px;color:#6B7280;margin-bottom:8px">HISTORIAL (${ates.length})</div>
+        ${ates.length===0?`<p style="color:#9CA3AF;font-size:13px">Sin atenciones registradas</p>`:""}
+        ${ates.map(a=>SCard(`
+          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px">
+            ${Badge(fmtDate(a.fecha),"#EFF4FF","#2563EB")}
+            ${Badge(a.tipo,"#F3F4F6","#6B7280")}
+            ${Badge(a.duracion+"min","#F3F4F6","#6B7280")}
+          </div>
+          <p style="font-size:13px;line-height:1.5">${esc(a.descripcion)}</p>
+          ${a.accionesSiguientes?`<div style="margin-top:8px;background:#FFFBEB;border-radius:8px;padding:8px 10px;font-size:12px;color:#D97706;font-weight:600">→ ${esc(a.accionesSiguientes)}</div>`:""}
+        `,"margin-bottom:8px")).join("")}
+      </div>
+      <div style="display:flex;gap:10px">
+        <button onclick="openSheet('intervencionEdit','${i.id}')" class="btn btn-primary tap" style="flex:1;justify-content:center">✏️ Editar</button>
+        <button onclick="eliminarIntervencion('${i.id}')" class="btn btn-danger tap">🗑</button>
+      </div>
+    </div>
+    ${STATE.sheet ? buildSheetIntervencion() : ""}
+  </div>`;
+}
+
+function buildSheetIntervencion(){
+  const f = STATE.form;
+  const selU = STATE.usuarios.find(u=>u.id===Number(f.usuarioId));
+  const busqModo = f._busqModo || "nombre";
+  const busqQ = f._busqQ || "";
+  const busqRes = busqQ.trim() ? STATE.usuarios.filter(u=>
+    busqModo==="nombre"?u.nombre.toLowerCase().includes(busqQ.toLowerCase()):(u.dni||"").includes(busqQ)
+  ).slice(0,6) : [];
+
+  return Sheet(f.id?"Editar intervención":"Nueva intervención", `
+    ${Field("Título *","f_titulo","text",f.titulo||"","",true)}
+    <div class="field">
+      <label>Usuario *</label>
+      ${selU?`<div style="display:flex;align-items:center;gap:10px;background:#EFF4FF;border:1.5px solid #2563EB;border-radius:10px;padding:9px 14px">
+        ${Avatar(selU.nombre,32,"#2563EB")}
+        <div style="flex:1;min-width:0">
+          <div style="font-weight:800;font-size:14px">${esc(selU.nombre)}</div>
+          <div style="font-size:11px;color:#2563EB">DNI: ${esc(selU.dni||"—")}</div>
+        </div>
+        <button onclick="setState({form:{...STATE.form,usuarioId:'',_busqQ:''}})" style="background:none;border:none;color:#6B7280;font-size:18px;cursor:pointer">×</button>
+      </div>`:`
+        <div style="display:flex;gap:8px;margin-bottom:6px">
+          <button onclick="setState({form:{...STATE.form,_busqModo:'nombre'}})" class="tap" style="flex:1;padding:7px;border-radius:8px;border:1.5px solid ${busqModo==='nombre'?'#2563EB':'#E4E8F0'};background:${busqModo==='nombre'?'#EFF4FF':'#fff'};color:${busqModo==='nombre'?'#2563EB':'#6B7280'};font-weight:700;font-size:12px;cursor:pointer;font-family:Nunito,sans-serif">👤 Por nombre</button>
+          <button onclick="setState({form:{...STATE.form,_busqModo:'dni'}})" class="tap" style="flex:1;padding:7px;border-radius:8px;border:1.5px solid ${busqModo==='dni'?'#2563EB':'#E4E8F0'};background:${busqModo==='dni'?'#EFF4FF':'#fff'};color:${busqModo==='dni'?'#2563EB':'#6B7280'};font-weight:700;font-size:12px;cursor:pointer;font-family:Nunito,sans-serif">🪪 Por DNI</button>
+        </div>
+        <div style="position:relative">
+          <input value="${esc(busqQ)}" oninput="setState({form:{...STATE.form,_busqQ:this.value}})" placeholder="${busqModo==='nombre'?'Escribir nombre…':'Escribir DNI…'}"
+            style="width:100%;background:#F9FAFB;border:1.5px solid #E4E8F0;border-radius:10px;color:#111827;padding:10px 12px;font-size:14px;font-family:Nunito,sans-serif">
+          ${busqRes.length>0?`<div style="position:absolute;top:calc(100% + 4px);left:0;right:0;background:#fff;border:1.5px solid #E4E8F0;border-radius:12px;box-shadow:0 6px 24px rgba(0,0,0,.12);z-index:50;overflow:hidden">
+            ${busqRes.map(u=>`<button onclick="setState({form:{...STATE.form,usuarioId:${u.id},_busqQ:''}})" class="tap" style="display:flex;align-items:center;gap:10px;width:100%;padding:10px 14px;background:transparent;border:none;border-bottom:1px solid #E4E8F0;text-align:left;cursor:pointer;font-family:Nunito,sans-serif">
+              ${Avatar(u.nombre,32,"#7C3AED")}
+              <div style="flex:1;min-width:0">
+                <div style="font-weight:700;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(u.nombre)}</div>
+                <div style="font-size:11px;color:#6B7280">DNI: ${esc(u.dni||"—")}</div>
+              </div>
+            </button>`).join("")}
+          </div>`:""}
+          ${busqQ.trim()&&!busqRes.length?`<div style="position:absolute;top:calc(100% + 4px);left:0;right:0;background:#fff;border:1.5px solid #E4E8F0;border-radius:12px;padding:14px;font-size:13px;color:#9CA3AF;z-index:50">Sin resultados</div>`:""}
+        </div>`}
+    </div>
+    ${Field("Categoría","f_categoria","text",f.categoria||"",CATS)}
+    ${SUBCATS[f.categoria]?Field("Subcategoría","f_subCategoria","text",f.subCategoria||"",SUBCATS[f.categoria]):""}
+    ${Field("Fecha","f_fechaInicio","date",f.fechaInicio||hoy())}
+    ${Field("Profesional","f_profesional","text",f.profesional||"",PROFS)}
+    ${Field("Descripción","f_descripcion","textarea",f.descripcion||"")}
+    <div style="display:flex;gap:10px">
+      <button onclick="closeSheet()" class="btn btn-ghost tap" style="flex:1;justify-content:center">Cancelar</button>
+      <button onclick="guardarIntervencion()" class="btn btn-primary tap" style="flex:2;justify-content:center">Guardar</button>
+    </div>`);
+}
+
+// ═══════════════════════════════════════════════════════
+// ATENCIONES
+// ═══════════════════════════════════════════════════════
+function buildAtenciones(){
+  const porFecha = STATE.atenciones.filter(a=>a.fecha===STATE.fechaAten).sort((a,b)=>a.id-b.id);
+  const totalMin = porFecha.reduce((s,a)=>s+(Number(a.duracion)||0),0);
+  return `
+    <div class="scard" style="padding:12px 16px;margin-bottom:14px">
+      <div style="display:flex;align-items:center;gap:8px">
+        <button onclick="shiftDay(-1)" class="tap" style="background:#F4F6FA;border:1px solid #E4E8F0;border-radius:8px;width:36px;height:36px;font-size:20px;color:#6B7280;display:flex;align-items:center;justify-content:center;cursor:pointer">‹</button>
+        <input type="date" value="${STATE.fechaAten}" onchange="setState({fechaAten:this.value})"
+          style="flex:1;background:transparent;border:none;font-size:14px;font-weight:700;color:#111827;text-align:center;font-family:Nunito,sans-serif">
+        <button onclick="shiftDay(1)" class="tap" style="background:#F4F6FA;border:1px solid #E4E8F0;border-radius:8px;width:36px;height:36px;font-size:20px;color:#6B7280;display:flex;align-items:center;justify-content:center;cursor:pointer">›</button>
+      </div>
+    </div>
+    <div class="grid2" style="margin-bottom:14px">
+      ${SCard(`<div style="text-align:center"><div style="font-size:28px;font-weight:800;color:#2563EB">${porFecha.length}</div><div style="font-size:11px;color:#6B7280;font-weight:600">Atenciones</div></div>`,"padding:12px")}
+      ${SCard(`<div style="text-align:center"><div style="font-size:28px;font-weight:800;color:#059669">${totalMin}</div><div style="font-size:11px;color:#6B7280;font-weight:600">Minutos</div></div>`,"padding:12px")}
+    </div>
+    <button onclick="openSheet('atencionNueva')" class="btn btn-primary btn-full tap" style="margin-bottom:14px">+ Registrar atención</button>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      ${porFecha.length===0?SCard('<p style="color:#9CA3AF;text-align:center;font-size:13px;padding:8px 0">Sin atenciones este día</p>'):""}
+      ${porFecha.map(a=>{
+        const u = STATE.usuarios.find(u=>u.id===a.usuarioId);
+        const i = STATE.intervenciones.find(i=>i.id===a.intervencionId);
+        return SCard(`
+          <div style="display:flex;gap:12px;align-items:flex-start">
+            ${Avatar(u?.nombre||"?",40,"#7C3AED")}
+            <div style="flex:1;min-width:0">
+              <div style="font-weight:800;font-size:14px;margin-bottom:4px">${esc(u?.nombre||"—")}</div>
+              <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">
+                ${Badge(a.tipo,"#EFF4FF","#2563EB")}
+                ${Badge(a.duracion+" min","#F3F4F6","#6B7280")}
+                ${i?CatChip(i.categoria):""}
+              </div>
+              <p style="font-size:12px;line-height:1.5">${esc(a.descripcion)}</p>
+              ${a.accionesSiguientes?`<div style="margin-top:8px;background:#FFFBEB;border-radius:8px;padding:7px 10px;font-size:11px;color:#D97706;font-weight:700">→ ${esc(a.accionesSiguientes)}</div>`:""}
+              <div style="display:flex;gap:8px;margin-top:10px">
+                <button onclick="openSheet('atencionEdit','${a.id}')" class="btn btn-ghost tap" style="font-size:11px;padding:5px 10px">✏️ Editar</button>
+                <button onclick="eliminarAtencion('${a.id}')" class="btn btn-danger tap" style="font-size:11px;padding:5px 10px">🗑</button>
+              </div>
+            </div>
+          </div>`);
+      }).join("")}
+    </div>
+    ${STATE.sheet ? buildSheetAtencion() : ""}`;
+}
+
+function buildSheetAtencion(){
+  const f = STATE.form;
+  const selI = STATE.intervenciones.find(i=>i.id===Number(f.intervencionId));
+  return Sheet(f.id?"Editar atención":"Registrar atención", `
+    <div class="field">
+      <label>Intervención vinculada</label>
+      ${Field("","f_intervencionId","text",f.intervencionId||"",STATE.intervenciones.map(i=>i.titulo))}
+    </div>
+    <div class="grid2">
+      ${Field("Fecha","f_fecha","date",f.fecha||STATE.fechaAten)}
+      ${Field("Tipo","f_tipo","text",f.tipo||"",TIPOS_ATENCION)}
+    </div>
+    <div class="grid2">
+      ${Field("Profesional","f_profesional","text",f.profesional||"",PROFS)}
+      ${Field("Minutos","f_duracion","number",f.duracion||30)}
+    </div>
+    ${Field("Descripción *","f_descripcion","textarea",f.descripcion||"")}
+    ${Field("Acciones siguientes","f_accionesSiguientes","textarea",f.accionesSiguientes||"")}
+    <div style="display:flex;gap:10px">
+      <button onclick="closeSheet()" class="btn btn-ghost tap" style="flex:1;justify-content:center">Cancelar</button>
+      <button onclick="guardarAtencion()" class="btn btn-primary tap" style="flex:2;justify-content:center">Guardar</button>
+    </div>`);
+}
+
+// ═══════════════════════════════════════════════════════
+// SEGUIMIENTO
+// ═══════════════════════════════════════════════════════
+function buildSeguimiento(){
+  if(STATE.detail && STATE.tab==="seguimiento") return buildSeguimientoDetalle();
+  return `
+    <div style="font-size:13px;color:#6B7280;font-weight:600;margin-bottom:10px">${STATE.intervenciones.length} intervenciones</div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      ${STATE.intervenciones.length===0?SCard('<p style="color:#9CA3AF;text-align:center;font-size:13px">Sin intervenciones registradas</p>'):""}
+      ${STATE.intervenciones.map(i=>{
+        const u = STATE.usuarios.find(u=>u.id===i.usuarioId);
+        const nA = STATE.atenciones.filter(a=>a.intervencionId===i.id).length;
+        const lastA = [...STATE.atenciones].filter(a=>a.intervencionId===i.id).sort((a,b)=>b.fecha.localeCompare(a.fecha))[0];
+        return SCard(`
+          <div style="display:flex;gap:12px;align-items:flex-start">
+            <div style="width:4px;border-radius:4px;align-self:stretch;background:${catColor(i.categoria)};flex-shrink:0;min-height:50px"></div>
+            <div style="flex:1;min-width:0">
+              <div style="font-weight:800;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:5px">${esc(i.titulo)}</div>
+              <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:5px">
+                ${CatChip(i.categoria)}
+                ${i.subCategoria?Badge(i.subCategoria,"#F3F4F6","#6B7280"):""}
+              </div>
+              <div style="font-size:12px;color:#6B7280;display:flex;gap:12px;flex-wrap:wrap">
+                <span>👤 ${esc(u?.nombre||"—")}</span>
+                <span>📋 ${nA} aten.</span>
+                ${lastA?`<span>Última: ${fmtDate(lastA.fecha)}</span>`:""}
+              </div>
+            </div>
+            <span style="color:#9CA3AF;font-size:20px;align-self:center">›</span>
+          </div>`, "", `openDetalle('seguimiento','${i.id}')`);
+      }).join("")}
+    </div>`;
+}
+
+function buildSeguimientoDetalle(){
+  const i = STATE.intervenciones.find(x=>x.id==STATE.detail);
+  if(!i) return "";
+  const u = STATE.usuarios.find(u=>u.id===i.usuarioId);
+  const ates = STATE.atenciones.filter(a=>a.intervencionId===i.id).sort((a,b)=>b.fecha.localeCompare(a.fecha));
+  return `<div style="position:fixed;inset:0;z-index:150;background:#F4F6FA;display:flex;flex-direction:column">
+    <div style="background:#fff;border-bottom:1px solid #E4E8F0;padding:14px 16px;display:flex;align-items:center;gap:12px;flex-shrink:0">
+      <button onclick="setState({detail:null})" class="tap" style="background:#F4F6FA;border:none;width:36px;height:36px;border-radius:50%;font-size:22px;color:#111827;cursor:pointer">‹</button>
+      <h2 style="font-size:15px;font-weight:800;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(i.titulo)}</h2>
+    </div>
+    <div style="padding:16px;flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:14px">
+      ${SCard(`
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+          ${CatChip(i.categoria)}
+          ${i.subCategoria?Badge(i.subCategoria,"#F3F4F6","#6B7280"):""}
+        </div>
+        ${[["Usuario",u?.nombre||"—"],["Profesional",i.profesional||"—"],["Fecha",fmtDate(i.fechaInicio)]].map(([k,v])=>`
+          <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #E4E8F0">
+            <span style="font-size:12px;color:#6B7280;font-weight:600">${k}</span>
+            <span style="font-size:13px;font-weight:700">${esc(v)}</span>
+          </div>`).join("")}
+        ${i.descripcion?`<p style="margin-top:12px;font-size:13px;line-height:1.6">${esc(i.descripcion)}</p>`:""}
+      `)}
+      <div>
+        <div style="font-weight:800;font-size:12px;color:#6B7280;margin-bottom:10px">HISTORIAL (${ates.length})</div>
+        ${ates.map((a,idx)=>`
+          <div style="display:flex;gap:10px;margin-bottom:10px">
+            <div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0">
+              <div style="width:10px;height:10px;border-radius:50%;background:#2563EB;margin-top:5px"></div>
+              ${idx<ates.length-1?`<div style="width:2px;flex:1;background:#E4E8F0;margin-top:2px"></div>`:""}
+            </div>
+            ${SCard(`
+              <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px">
+                ${Badge(fmtDate(a.fecha),"#EFF4FF","#2563EB")}
+                ${Badge(a.tipo,"#F3F4F6","#6B7280")}
+                ${Badge(a.duracion+"min","#F3F4F6","#6B7280")}
+              </div>
+              <p style="font-size:13px;line-height:1.5">${esc(a.descripcion)}</p>
+              ${a.accionesSiguientes?`<div style="margin-top:8px;background:#FFFBEB;border-radius:8px;padding:7px 10px;font-size:12px;color:#D97706;font-weight:700">→ ${esc(a.accionesSiguientes)}</div>`:""}
+            `,"flex:1;margin-bottom:0")}
+          </div>`).join("")}
+        ${ates.length===0?`<p style="color:#9CA3AF;font-size:13px">Sin atenciones registradas</p>`:""}
+      </div>
+    </div>
+  </div>`;
+}
+
+// ═══════════════════════════════════════════════════════
+// INSTITUCIONAL
+// ═══════════════════════════════════════════════════════
+function buildInstitucional(){
+  if(STATE.actaReunion) return buildActaView();
+  if(STATE.detail && STATE.tab==="institucional") return buildReunionDetalle();
+  return `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <div style="font-size:13px;color:#6B7280;font-weight:600">${STATE.reuniones.length} reunión${STATE.reuniones.length!==1?"es":""}</div>
+      <button onclick="openSheet('reunionNueva')" class="btn btn-primary tap">+ Nueva reunión</button>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      ${STATE.reuniones.length===0?SCard(`<div style="text-align:center;padding:24px 0;color:#9CA3AF">
+        <div style="font-size:40px;margin-bottom:10px">🏛</div>
+        <div style="font-size:13px;font-weight:700;color:#6B7280">Sin reuniones registradas</div>
+        <div style="font-size:12px;margin-top:4px">Tocá "+ Nueva reunión" para empezar</div>
+      </div>`):""}
+      ${[...STATE.reuniones].sort((a,b)=>b.fecha.localeCompare(a.fecha)).map(r=>SCard(`
+        <div style="display:flex;gap:12px;align-items:flex-start">
+          <div style="width:44px;height:44px;border-radius:12px;background:#EFF4FF;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">🏛</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-weight:800;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:4px">${esc(r.titulo)}</div>
+            ${Badge(r.tipo,"#EFF4FF","#2563EB")}
+            <div style="font-size:12px;color:#6B7280;margin-top:4px;display:flex;gap:10px;flex-wrap:wrap">
+              <span>📅 ${fmtDate(r.fecha)}</span>
+              ${r.lugar?`<span>📍 ${esc(r.lugar)}</span>`:""}
+              ${(r.participantes||[]).length>0?`<span>👥 ${r.participantes.length}</span>`:""}
+              ${(r.situaciones||[]).length>0?`<span>🗂 ${r.situaciones.length}</span>`:""}
+            </div>
+          </div>
+          <span style="color:#9CA3AF;font-size:20px;align-self:center">›</span>
+        </div>`, "", `openDetalle('reunion','${r.id}')`)).join("")}
+    </div>
+    ${STATE.sheet ? buildSheetReunion() : ""}`;
+}
+
+function buildReunionDetalle(){
+  const r = STATE.reuniones.find(x=>x.id==STATE.detail);
+  if(!r) return "";
+  return `<div style="position:fixed;inset:0;z-index:150;background:#F4F6FA;display:flex;flex-direction:column">
+    <div style="background:#fff;border-bottom:1px solid #E4E8F0;padding:14px 16px;display:flex;align-items:center;gap:12px;flex-shrink:0">
+      <button onclick="setState({detail:null})" class="tap" style="background:#F4F6FA;border:none;width:36px;height:36px;border-radius:50%;font-size:22px;color:#111827;cursor:pointer">‹</button>
+      <h2 style="font-size:15px;font-weight:800;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(r.titulo)}</h2>
+    </div>
+    <div style="padding:16px;flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:14px">
+      ${SCard(`
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px">
+          ${Badge(r.tipo,"#EFF4FF","#2563EB")}
+          ${Badge(fmtDate(r.fecha),"#F3F4F6","#6B7280")}
+          ${r.lugar?Badge("📍 "+r.lugar,"#F3F4F6","#6B7280"):""}
+        </div>
+        ${(r.participantes||[]).length>0?`
+          <div style="font-size:11px;font-weight:800;color:#6B7280;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">👥 Participantes</div>
+          ${(r.participantes||[]).map(p=>`<div style="display:flex;align-items:center;gap:8px;background:#F3F4F6;border-radius:8px;padding:6px 10px;margin-bottom:5px">
+            <span style="font-size:14px">👤</span><span style="font-size:13px;font-weight:600">${esc(p.nombre)}</span>
+          </div>`).join("")}
+          ${Divider()}`:""}
+        ${(r.situaciones||[]).length>0?`
+          <div style="font-size:11px;font-weight:800;color:#7C3AED;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">🗂 Situaciones abordadas</div>
+          ${(r.situaciones||[]).map(s=>`<div style="display:flex;align-items:center;gap:8px;background:${s.usuarioId?"#EFF4FF":"#F3F4F6"};border-radius:8px;padding:6px 10px;margin-bottom:5px">
+            ${Avatar(s.nombre,26,s.usuarioId?"#2563EB":"#9CA3AF")}
+            <div style="flex:1;min-width:0">
+              <div style="font-size:12px;font-weight:700">${esc(s.nombre)}</div>
+              ${s.dni?`<div style="font-size:11px;color:#6B7280">DNI: ${esc(s.dni)}${s.usuarioId?` <span style="color:#2563EB;font-weight:700">✓ En legajo</span>`:""}</div>`:""}
+            </div>
+          </div>`).join("")}
+          ${Divider()}`:""}
+        ${r.temas?`<div style="font-size:11px;font-weight:800;color:#6B7280;text-transform:uppercase;letter-spacing:1px;margin-bottom:5px">Temas tratados</div>
+          <p style="font-size:13px;line-height:1.6;white-space:pre-wrap;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid #E4E8F0">${esc(r.temas)}</p>`:""}
+        ${r.acuerdos?`<div style="background:#ECFDF5;border-radius:10px;padding:10px 12px;margin-bottom:10px">
+          <div style="font-size:11px;font-weight:800;color:#059669;text-transform:uppercase;letter-spacing:1px;margin-bottom:5px">Acuerdos</div>
+          <p style="font-size:13px;line-height:1.6;white-space:pre-wrap">${esc(r.acuerdos)}</p>
+        </div>`:""}
+        ${r.observaciones?`<div style="background:#FFFBEB;border-radius:10px;padding:10px 12px">
+          <div style="font-size:11px;font-weight:800;color:#D97706;text-transform:uppercase;letter-spacing:1px;margin-bottom:5px">Observaciones</div>
+          <p style="font-size:13px;line-height:1.6;white-space:pre-wrap">${esc(r.observaciones)}</p>
+        </div>`:""}
+      `)}
+      <button onclick="setState({actaReunion:STATE.detail})" class="btn btn-green btn-full tap">📄 Ver acta</button>
+      <div style="display:flex;gap:10px">
+        <button onclick="openSheet('reunionEdit','${r.id}')" class="btn btn-primary tap" style="flex:1;justify-content:center">✏️ Editar</button>
+        <button onclick="eliminarReunion('${r.id}')" class="btn btn-danger tap">🗑</button>
+      </div>
+    </div>
+    ${STATE.sheet ? buildSheetReunion() : ""}
+  </div>`;
+}
+
+function buildActaView(){
+  const r = STATE.reuniones.find(x=>x.id==STATE.actaReunion);
+  if(!r) return "";
+  return `<div style="position:fixed;inset:0;z-index:160;background:#F4F6FA;display:flex;flex-direction:column">
+    <div style="background:#fff;border-bottom:1px solid #E4E8F0;padding:14px 16px;display:flex;align-items:center;gap:8px;flex-shrink:0">
+      <button onclick="setState({actaReunion:null})" class="tap" style="background:#F4F6FA;border:none;width:36px;height:36px;border-radius:50%;font-size:22px;color:#111827;cursor:pointer">‹</button>
+      <h2 style="font-size:15px;font-weight:800;flex:1">Acta de reunión</h2>
+    </div>
+    <div style="padding:16px;flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:14px">
+      <div class="acta-header">
+        <div style="font-size:11px;opacity:.75;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Acta de Reunión</div>
+        <div style="font-size:18px;font-weight:800;margin-bottom:12px">${esc(r.titulo)}</div>
+        <div style="display:flex;gap:14px;flex-wrap:wrap;font-size:12px;opacity:.9">
+          <span>📅 ${fmtDate(r.fecha)}</span><span>🏷 ${esc(r.tipo)}</span>${r.lugar?`<span>📍 ${esc(r.lugar)}</span>`:""}
+        </div>
+      </div>
+      ${(r.participantes||[]).length>0?SCard(`
+        <div style="font-size:11px;font-weight:800;color:#6B7280;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">👥 Participantes</div>
+        ${(r.participantes||[]).map(p=>`<div style="display:flex;align-items:center;gap:8px;background:#F3F4F6;border-radius:8px;padding:7px 10px;margin-bottom:5px">
+          <span style="font-size:15px">👤</span><span style="font-size:13px;font-weight:600">${esc(p.nombre)}</span>
+        </div>`).join("")}`):""}
+      ${(r.situaciones||[]).length>0?SCard(`
+        <div style="font-size:11px;font-weight:800;color:#7C3AED;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">🗂 Situaciones abordadas</div>
+        ${(r.situaciones||[]).map(s=>`<div style="display:flex;align-items:center;gap:8px;background:${s.usuarioId?"#EFF4FF":"#F3F4F6"};border-radius:8px;padding:7px 10px;margin-bottom:5px">
+          ${Avatar(s.nombre,28,s.usuarioId?"#2563EB":"#9CA3AF")}
+          <div style="flex:1;min-width:0">
+            <div style="font-size:13px;font-weight:700">${esc(s.nombre)}</div>
+            ${s.dni?`<div style="font-size:11px;color:#6B7280">DNI: ${esc(s.dni)}${s.usuarioId?` <span style="color:#2563EB;font-weight:700">✓</span>`:""}</div>`:""}
+          </div>
+        </div>`).join("")}`,"border-left:4px solid #7C3AED"):""}
+      ${r.temas?SCard(`<div style="font-size:11px;font-weight:800;color:#6B7280;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Temas tratados</div><p style="font-size:13px;line-height:1.7;white-space:pre-wrap">${esc(r.temas)}</p>`):""}
+      ${r.acuerdos?SCard(`<div style="font-size:11px;font-weight:800;color:#059669;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Acuerdos y compromisos</div><p style="font-size:13px;line-height:1.7;white-space:pre-wrap">${esc(r.acuerdos)}</p>`,"border-left:4px solid #059669"):""}
+      ${r.observaciones?SCard(`<div style="font-size:11px;font-weight:800;color:#D97706;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Observaciones</div><p style="font-size:13px;line-height:1.7;white-space:pre-wrap">${esc(r.observaciones)}</p>`,"border-left:4px solid #D97706"):""}
+      <div style="background:#F3F4F6;border-radius:10px;padding:10px 14px;font-size:11px;color:#9CA3AF;text-align:center">Equipo de Acción Social · Murphy, Santa Fe, CP 2601 · ${fmtDate(hoy())}</div>
+    </div>
+  </div>`;
+}
+
+function buildSheetReunion(){
+  const f = STATE.form;
+  const parts = f.participantes || [];
+  const sits  = f.situaciones  || [];
+  return Sheet(f.id?"Editar reunión":"Nueva reunión", `
+    ${Field("Título *","f_titulo","text",f.titulo||"","",true)}
+    <div class="grid2">
+      ${Field("Fecha","f_fecha","date",f.fecha||hoy())}
+      ${Field("Tipo","f_tipo","text",f.tipo||"",TIPOS_REUNION)}
+    </div>
+    ${Field("Lugar","f_lugar","text",f.lugar||"")}
+    <div class="field" style="background:#F4F6FA;border-radius:10px;padding:12px 14px;border:1.5px solid #E4E8F0">
+      <label style="font-size:12px;font-weight:700;color:#6B7280;margin-bottom:10px;display:block">👥 Participantes</label>
+      ${parts.map((p,i)=>`<div style="display:flex;align-items:center;gap:8px;background:#F3F4F6;border-radius:8px;padding:6px 10px;margin-bottom:5px">
+        <span style="font-size:14px">👤</span>
+        <span style="flex:1;font-size:13px;font-weight:600">${esc(p.nombre)}</span>
+        <button onclick="removeParticipante(${i})" style="background:none;border:none;color:#DC2626;font-size:16px;cursor:pointer">×</button>
+      </div>`).join("")}
+      <div style="display:flex;gap:8px">
+        <input id="inp_partNombre" value="${esc(STATE.partNombre)}" oninput="STATE.partNombre=this.value" placeholder="Nombre del participante"
+          style="flex:1;background:#fff;border:1.5px solid #E4E8F0;border-radius:10px;color:#111827;padding:10px 12px;font-size:14px;font-family:Nunito,sans-serif">
+        <button onclick="addParticipante()" class="tap" style="background:#2563EB;color:#fff;border:none;border-radius:10px;padding:0 14px;font-size:20px;font-weight:700;height:42px;flex-shrink:0;cursor:pointer">+</button>
+      </div>
+    </div>
+    <div class="field" style="background:#F4F6FA;border-radius:10px;padding:12px 14px;border:1.5px solid #F5F3FF">
+      <label style="font-size:12px;font-weight:700;color:#7C3AED;margin-bottom:10px;display:block">🗂 Situaciones abordadas</label>
+      ${sits.map((s,i)=>`<div style="display:flex;align-items:center;gap:8px;background:${s.usuarioId?"#EFF4FF":"#F3F4F6"};border-radius:8px;padding:6px 10px;margin-bottom:5px">
+        ${Avatar(s.nombre,26,s.usuarioId?"#2563EB":"#9CA3AF")}
+        <div style="flex:1;min-width:0">
+          <div style="font-size:12px;font-weight:700">${esc(s.nombre)}</div>
+          ${s.dni?`<div style="font-size:11px;color:#6B7280">DNI: ${esc(s.dni)}${s.usuarioId?` <span style="color:#2563EB">✓</span>`:""}</div>`:""}
+        </div>
+        <button onclick="removeSituacion(${i})" style="background:none;border:none;color:#DC2626;font-size:16px;cursor:pointer">×</button>
+      </div>`).join("")}
+      <input id="inp_sitNombre" value="${esc(STATE.sitNombre)}" oninput="STATE.sitNombre=this.value" placeholder="Nombre de la persona"
+        style="width:100%;background:#fff;border:1.5px solid #E4E8F0;border-radius:10px;color:#111827;padding:10px 12px;font-size:14px;margin-bottom:6px;font-family:Nunito,sans-serif">
+      <div style="display:flex;gap:8px">
+        <input id="inp_sitDni" value="${esc(STATE.sitDni)}" oninput="STATE.sitDni=this.value" placeholder="DNI (opcional, para vincular al legajo)"
+          style="flex:1;background:#fff;border:1.5px solid #E4E8F0;border-radius:10px;color:#111827;padding:10px 12px;font-size:14px;font-family:Nunito,sans-serif">
+        <button onclick="addSituacion()" class="tap" style="background:#7C3AED;color:#fff;border:none;border-radius:10px;padding:0 14px;font-size:20px;font-weight:700;height:42px;flex-shrink:0;cursor:pointer">+</button>
+      </div>
+      <div style="font-size:11px;color:#9CA3AF;margin-top:6px">Si el DNI coincide con un usuario registrado se vincula automáticamente al legajo.</div>
+    </div>
+    ${Field("Temas tratados","f_temas","textarea",f.temas||"")}
+    ${Field("Acuerdos y compromisos","f_acuerdos","textarea",f.acuerdos||"")}
+    ${Field("Observaciones","f_observaciones","textarea",f.observaciones||"")}
+    <div style="display:flex;gap:10px;padding-top:4px">
+      <button onclick="closeSheet()" class="btn btn-ghost tap" style="flex:1;justify-content:center">Cancelar</button>
+      <button onclick="guardarReunion()" class="btn btn-primary tap" style="flex:2;justify-content:center">Guardar</button>
+    </div>`);
+}
+
+// ═══════════════════════════════════════════════════════
+// LEGAJO
+// ═══════════════════════════════════════════════════════
+function buildLegajo(){
+  const {legajoModo:modo, legajoQuery:query, legajoSel:selId} = STATE;
+  const sel = selId ? STATE.usuarios.find(u=>u.id==selId) : null;
+  const resultados = query.trim() ? STATE.usuarios.filter(u=>
+    modo==="nombre"?u.nombre.toLowerCase().includes(query.toLowerCase()):(u.dni||"").includes(query)
+  ).slice(0,8) : [];
+
+  return `
+    ${SCard(`<div style="color:#fff">
+      <div style="font-size:11px;opacity:.8;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Legajo completo</div>
+      <div style="font-size:15px;font-weight:800;line-height:1.4">Buscá por nombre o DNI y descargá toda la información del usuario</div>
+    </div>`,"background:linear-gradient(135deg,#6D28D9,#7C3AED);border:none;margin-bottom:14px")}
+    <div style="display:flex;gap:8px;margin-bottom:12px">
+      ${["nombre","dni"].map(m=>`<button onclick="setState({legajoModo:'${m}',legajoQuery:'',legajoSel:null})" class="tap"
+        style="flex:1;padding:9px;border-radius:10px;border:2px solid ${modo===m?'#7C3AED':'#E4E8F0'};background:${modo===m?'#F5F3FF':'#fff'};color:${modo===m?'#7C3AED':'#6B7280'};font-weight:700;font-size:13px;cursor:pointer;font-family:Nunito,sans-serif">
+        ${m==="nombre"?"👤 Por nombre":"🪪 Por DNI"}
+      </button>`).join("")}
+    </div>
+    ${!sel?`
+      <div style="position:relative;margin-bottom:12px">
+        <input value="${esc(query)}" oninput="setState({legajoQuery:this.value})" autofocus
+          placeholder="${modo==="nombre"?"Escribir nombre…":"Escribir DNI…"}"
+          style="width:100%;background:#fff;border:1.5px solid ${query?'#7C3AED':'#E4E8F0'};border-radius:10px;padding:11px 14px;font-size:14px;color:#111827;font-family:Nunito,sans-serif">
+        ${resultados.length>0?`<div style="position:absolute;top:calc(100% + 4px);left:0;right:0;background:#fff;border:1.5px solid #E4E8F0;border-radius:12px;box-shadow:0 6px 24px rgba(0,0,0,.12);z-index:50;overflow:hidden">
+          ${resultados.map(u=>{
+            const nI=STATE.intervenciones.filter(i=>i.usuarioId===u.id).length;
+            const nA=STATE.atenciones.filter(a=>a.usuarioId===u.id).length;
+            return `<button onclick="setState({legajoSel:${u.id},legajoQuery:''})" class="tap" style="display:flex;align-items:center;gap:12px;width:100%;padding:12px 16px;background:transparent;border:none;border-bottom:1px solid #E4E8F0;text-align:left;cursor:pointer;font-family:Nunito,sans-serif">
+              ${Avatar(u.nombre,40,"#7C3AED")}
+              <div style="flex:1;min-width:0">
+                <div style="font-weight:800;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(u.nombre)}</div>
+                <div style="font-size:12px;color:#6B7280;margin-top:2px;display:flex;gap:10px">
+                  <span>🪪 ${esc(u.dni||"Sin DNI")}</span><span>📋 ${nI}</span><span>📅 ${nA}</span>
+                </div>
+              </div>
+              <span style="color:#9CA3AF;font-size:18px">›</span>
+            </button>`;
+          }).join("")}
+        </div>`:""}
+        ${query.trim()&&!resultados.length?`<div style="position:absolute;top:calc(100% + 4px);left:0;right:0;background:#fff;border:1.5px solid #E4E8F0;border-radius:12px;padding:14px;font-size:13px;color:#9CA3AF;z-index:50">Sin resultados para "${esc(query)}"</div>`:""}
+      </div>`:""}
+    ${sel?`
+      ${SCard(`
+        <div style="display:flex;align-items:center;gap:12px">
+          ${Avatar(sel.nombre,48,"#7C3AED")}
+          <div style="flex:1;min-width:0">
+            <div style="font-weight:800;font-size:16px">${esc(sel.nombre)}</div>
+            <div style="font-size:12px;color:#6B7280;margin-top:2px;display:flex;gap:12px;flex-wrap:wrap">
+              <span>🪪 ${esc(sel.dni||"Sin DNI")}</span>
+              ${sel.fechaNac?`<span>📅 ${fmtDate(sel.fechaNac)}</span>`:""}
+            </div>
+          </div>
+          <button onclick="setState({legajoSel:null})" style="background:none;border:none;color:#6B7280;font-size:20px;cursor:pointer">×</button>
+        </div>
+      `,"border-left:4px solid #7C3AED;margin-bottom:12px")}
+      ${(()=>{
+        const ints  = STATE.intervenciones.filter(i=>i.usuarioId===sel.id);
+        const ates  = STATE.atenciones.filter(a=>a.usuarioId===sel.id);
+        const reuns = STATE.reuniones.filter(r=>(r.situaciones||[]).some(s=>s.usuarioId===sel.id||(s.dni&&sel.dni&&s.dni===sel.dni)));
+        return `<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px">
+          ${[{icon:"📋",val:ints.length,label:"Interv."},{icon:"📅",val:ates.length,label:"Atenciones"},{icon:"🏛",val:reuns.length,label:"Reuniones"}].map(x=>
+            SCard(`<div style="text-align:center"><div style="font-size:20px">${x.icon}</div><div style="font-size:22px;font-weight:800;color:#7C3AED;margin-top:2px">${x.val}</div><div style="font-size:10px;color:#6B7280;font-weight:600">${x.label}</div></div>`,"padding:10px 6px")).join("")}
+        </div>`;
+      })()}
+      <button onclick="imprimirLegajo(${sel.id})" class="btn btn-green btn-full tap" style="font-size:14px">📄 Descargar legajo completo</button>`:""}
+    ${!sel&&!query?SCard(`<div style="text-align:center;padding:20px 0;color:#9CA3AF">
+      <div style="font-size:40px;margin-bottom:10px">📂</div>
+      <div style="font-size:13px;font-weight:700;color:#6B7280">Buscá un usuario para ver su legajo</div>
+      <div style="font-size:12px;margin-top:4px">Por nombre o por DNI</div>
+    </div>`):""}`;
+}
+
+// ═══════════════════════════════════════════════════════
+// MAPA
+// ═══════════════════════════════════════════════════════
+function buildMapa(){
+  const puntos = STATE.usuarios.filter(u=>{
+    if(!u.direccion) return false;
+    if(!STATE.mapaCat) return STATE.intervenciones.some(i=>i.usuarioId===u.id);
+    return STATE.intervenciones.some(i=>i.usuarioId===u.id&&i.categoria===STATE.mapaCat);
+  }).map(u=>{
+    const cats = [...new Set(STATE.intervenciones.filter(i=>i.usuarioId===u.id&&(!STATE.mapaCat||i.categoria===STATE.mapaCat)).map(i=>i.categoria))];
+    return {...u,cats};
+  });
+  const totalConDir = STATE.usuarios.filter(u=>u.direccion&&STATE.intervenciones.some(i=>i.usuarioId===u.id)).length;
+
+  return `
+    ${SCard(`<div style="color:#fff">
+      <div style="font-size:11px;opacity:.8;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Análisis territorial</div>
+      <div style="font-size:16px;font-weight:800;margin-bottom:4px">Murphy, Santa Fe, CP 2601</div>
+      <div style="font-size:13px;opacity:.9">${totalConDir} usuario${totalConDir!==1?"s":""} con dirección registrada</div>
+    </div>`,"background:linear-gradient(135deg,#064e3b,#059669);border:none;margin-bottom:16px")}
+    <div style="margin-bottom:14px">
+      <div style="font-size:12px;font-weight:700;color:#6B7280;margin-bottom:8px">Filtrar por categoría</div>
+      <div class="hscroll">
+        <button onclick="setState({mapaCat:''})" class="pill ${!STATE.mapaCat?'active':'inactive'} tap">Todas</button>
+        ${CATS.map(c=>`<button onclick="setState({mapaCat:STATE.mapaCat==='${c}'?'':'${c}'})" class="tap"
+          style="border:none;border-radius:20px;padding:5px 14px;font-size:12px;font-weight:600;white-space:nowrap;cursor:pointer;font-family:Nunito,sans-serif;background:${STATE.mapaCat===c?catColor(c):'#F1F5F9'};color:${STATE.mapaCat===c?'#fff':'#6B7280'}">
+          ${c}
+        </button>`).join("")}
+      </div>
+    </div>
+    <button onclick="abrirMapa()" class="btn btn-green btn-full tap" style="font-size:14px;margin-bottom:14px">🗺 Abrir mapa territorial</button>
+    <div>
+      <div style="font-size:12px;font-weight:700;color:#6B7280;margin-bottom:8px;text-transform:uppercase;letter-spacing:1px">Usuarios en el mapa (${puntos.length})</div>
+      ${puntos.length===0?SCard(`<p style="color:#9CA3AF;text-align:center;font-size:13px;padding:8px 0">${totalConDir===0?"Registrá direcciones en los usuarios para usar el mapa":"Sin resultados para este filtro"}</p>`):""}
+      ${puntos.map(p=>SCard(`
+        <div style="display:flex;gap:10px;align-items:flex-start">
+          ${Avatar(p.nombre,38,STATE.mapaCat?catColor(STATE.mapaCat):"#2563EB")}
+          <div style="flex:1;min-width:0">
+            <div style="font-weight:800;font-size:14px;margin-bottom:3px">${esc(p.nombre)}</div>
+            <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.direccion+", Murphy, Santa Fe, CP 2601")}" target="_blank"
+              style="font-size:12px;color:#2563EB;text-decoration:none;display:block;margin-bottom:5px">📍 ${esc(p.direccion)} ›</a>
+            <div style="display:flex;gap:4px;flex-wrap:wrap">
+              ${p.cats.map(c=>`<span style="background:${catColor(c)}22;color:${catColor(c)};border-radius:12px;padding:1px 8px;font-size:11px;font-weight:700">${c}</span>`).join("")}
+            </div>
+          </div>
+        </div>`,"margin-bottom:8px")).join("")}
+    </div>`;
+}
+
+// ═══════════════════════════════════════════════════════
+// CALENDARIO
+// ═══════════════════════════════════════════════════════
+function buildCalendario(){
+  const {calYear:year,calMonth:month,calVista:vista,calDia:diaSelec} = STATE;
+  const primerDia = new Date(year,month,1).getDay();
+  const totalDias = new Date(year,month+1,0).getDate();
+  const todayStr = hoy();
+
+  const getEvsDia = (d) => {
+    if(!d) return [];
+    const fecha = `${year}-${String(month+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
+    return STATE.eventos.filter(e=>e.fecha===fecha).sort((a,b)=>(a.hora||"").localeCompare(b.hora||""));
+  };
+
+  const proximos = [...STATE.eventos].filter(e=>e.fecha>=todayStr).sort((a,b)=>a.fecha.localeCompare(b.fecha)||(a.hora||"").localeCompare(b.hora||"")).slice(0,15);
+
+  return `
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+      <div style="font-size:12px;color:#6B7280;font-weight:600">${STATE.eventos.length} evento${STATE.eventos.length!==1?"s":""}</div>
+      <button onclick="openSheet('eventoNuevo')" class="btn btn-primary tap" style="padding:8px 14px;font-size:12px">+ Evento</button>
+    </div>
+    <div style="display:flex;gap:6px;margin-bottom:14px">
+      <button onclick="setState({calVista:'mes'})" class="tap" style="flex:1;padding:7px;border-radius:10px;border:1.5px solid ${vista==='mes'?'#2563EB':'#E4E8F0'};background:${vista==='mes'?'#EFF4FF':'transparent'};color:${vista==='mes'?'#2563EB':'#6B7280'};font-weight:700;font-size:12px;cursor:pointer;font-family:Nunito,sans-serif">📅 Mes</button>
+      <button onclick="setState({calVista:'agenda'})" class="tap" style="flex:1;padding:7px;border-radius:10px;border:1.5px solid ${vista==='agenda'?'#2563EB':'#E4E8F0'};background:${vista==='agenda'?'#EFF4FF':'transparent'};color:${vista==='agenda'?'#2563EB':'#6B7280'};font-weight:700;font-size:12px;cursor:pointer;font-family:Nunito,sans-serif">📋 Agenda</button>
+    </div>
+    ${vista==="mes"?`
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
+        <button onclick="navMes(-1)" class="tap" style="background:#fff;border:1px solid #E4E8F0;border-radius:10px;width:38px;height:38px;font-size:18px;color:#6B7280;display:flex;align-items:center;justify-content:center;cursor:pointer">‹</button>
+        <div style="flex:1;text-align:center">
+          <div style="font-size:18px;font-weight:800">${MESES[month]}</div>
+          <div style="font-size:12px;color:#6B7280">${year}</div>
+        </div>
+        <button onclick="navMes(1)" class="tap" style="background:#fff;border:1px solid #E4E8F0;border-radius:10px;width:38px;height:38px;font-size:18px;color:#6B7280;display:flex;align-items:center;justify-content:center;cursor:pointer">›</button>
+      </div>
+      ${SCard(`
+        <div style="display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:6px">
+          ${DIAS_CORTO.map(d=>`<div style="text-align:center;font-size:11px;font-weight:700;color:#9CA3AF;padding:2px 0">${d}</div>`).join("")}
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px">
+          ${Array(primerDia).fill(null).map((_,i)=>`<div key="e${i}"></div>`).join("")}
+          ${Array.from({length:totalDias},(_,i)=>i+1).map(d=>{
+            const fecha=`${year}-${String(month+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
+            const evs=getEvsDia(d);
+            const isToday=fecha===todayStr;
+            const isSel=diaSelec===d;
+            return `<button onclick="setState({calDia:${isSel?'null':d}})" class="tap"
+              style="background:${isSel?'#2563EB':isToday?'#EFF4FF':'transparent'};border-radius:10px;padding:6px 2px;border:1.5px solid ${isSel?'#2563EB':isToday?'rgba(37,99,235,.4)':'transparent'};cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;min-height:44px">
+              <span style="font-size:13px;font-weight:${isToday||isSel?800:500};color:${isSel?'#fff':isToday?'#2563EB':'#111827'}">${d}</span>
+              <div style="display:flex;gap:2px;flex-wrap:wrap;justify-content:center">
+                ${evs.slice(0,3).map(e=>`<div style="width:6px;height:6px;border-radius:50%;background:${isSel?'rgba(255,255,255,.8)':tipoColor(e.tipo)}"></div>`).join("")}
+                ${evs.length>3?`<span style="font-size:8px;color:${isSel?'rgba(255,255,255,.8)':'#9CA3AF'};font-weight:700">+${evs.length-3}</span>`:""}
+              </div>
+            </button>`;
+          }).join("")}
+        </div>`,"padding:12px 10px")}
+      ${diaSelec?(()=>{
+        const evs=getEvsDia(diaSelec);
+        const fechaLabel=fmtDate(`${year}-${String(month+1).padStart(2,"0")}-${String(diaSelec).padStart(2,"0")}`);
+        return `<div style="margin-top:14px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+            <div style="font-weight:800;font-size:14px">${fechaLabel}</div>
+            <button onclick="openSheet('eventoNuevoDia')" class="btn btn-primary tap" style="padding:6px 12px;font-size:12px">+ Agregar</button>
+          </div>
+          ${evs.length===0?SCard('<p style="color:#9CA3AF;text-align:center;font-size:13px;padding:8px 0">Sin eventos este día</p>'):""}
+          ${evs.map(e=>SCard(`
+            <div style="display:flex;gap:10px;align-items:center">
+              <span style="font-size:22px;flex-shrink:0">${tipoIcon(e.tipo)}</span>
+              <div style="flex:1;min-width:0">
+                <div style="font-weight:800;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(e.titulo)}</div>
+                <div style="font-size:12px;color:#6B7280;margin-top:2px;display:flex;gap:8px;flex-wrap:wrap">
+                  ${e.hora?`<span>🕐 ${e.hora}${e.horaFin?" – "+e.horaFin:""}</span>`:""}
+                  <span style="color:${tipoColor(e.tipo)};font-weight:600">${e.tipo}</span>
+                  ${e.profesional?`<span>👤 ${esc(e.profesional)}</span>`:""}
+                </div>
+              </div>
+              <div style="display:flex;gap:4px">
+                <button onclick="openSheet('eventoEdit','${e.id}')" style="background:none;border:none;font-size:16px;cursor:pointer">✏️</button>
+                <button onclick="eliminarEvento('${e.id}')" style="background:none;border:none;font-size:16px;cursor:pointer">🗑</button>
+              </div>
+            </div>`,"margin-bottom:8px;border-left:4px solid "+tipoColor(e.tipo))).join("")}
+        </div>`;
+      })():""}
+    `:`
+      <div style="font-size:13px;color:#6B7280;font-weight:600;margin-bottom:10px">Próximos ${proximos.length} eventos</div>
+      ${proximos.length===0?SCard(`<div style="text-align:center;padding:20px 0;color:#9CA3AF"><div style="font-size:36px;margin-bottom:8px">🗓</div><div style="font-size:13px;font-weight:700;color:#6B7280">Sin eventos próximos</div></div>`):""}
+      ${proximos.map((e,idx,arr)=>{
+        const prevFecha=idx>0?arr[idx-1].fecha:null;
+        const mostrar=e.fecha!==prevFecha;
+        return `${mostrar?`<div style="font-size:12px;font-weight:800;color:#6B7280;text-transform:uppercase;letter-spacing:1px;padding:8px 4px 4px;display:flex;align-items:center;gap:6px">
+          <div style="width:6px;height:6px;border-radius:50%;background:${e.fecha===todayStr?'#2563EB':'#9CA3AF'}"></div>
+          ${e.fecha===todayStr?"Hoy":fmtDate(e.fecha)}
+        </div>`:""}
+        ${SCard(`<div style="display:flex;gap:10px;align-items:center">
+          <span style="font-size:22px;flex-shrink:0">${tipoIcon(e.tipo)}</span>
+          <div style="flex:1;min-width:0">
+            <div style="font-weight:800;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(e.titulo)}</div>
+            <div style="font-size:12px;color:#6B7280;margin-top:2px;display:flex;gap:8px;flex-wrap:wrap">
+              ${e.hora?`<span>🕐 ${e.hora}${e.horaFin?" – "+e.horaFin:""}</span>`:""}
+              <span style="color:${tipoColor(e.tipo)};font-weight:600">${e.tipo}</span>
+              ${e.lugar?`<span>📍 ${esc(e.lugar)}</span>`:""}
+            </div>
+          </div>
+          <div style="display:flex;gap:4px">
+            <button onclick="openSheet('eventoEdit','${e.id}')" style="background:none;border:none;font-size:16px;cursor:pointer">✏️</button>
+            <button onclick="eliminarEvento('${e.id}')" style="background:none;border:none;font-size:16px;cursor:pointer">🗑</button>
+          </div>
+        </div>`,"margin-bottom:4px;border-left:4px solid "+tipoColor(e.tipo))}`;
+      }).join("")}
+    `}
+    ${STATE.sheet ? buildSheetEvento() : ""}`;
+}
+
+function buildSheetEvento(){
+  const f = STATE.form;
+  const TIPOS_EV = ["Reunión","Visita","Trámite","Capacitación","Recordatorio","Otro"];
+  const PROFS_EV = [...PROFS,"Todo el equipo"];
+  return Sheet(f.id?"Editar evento":"Nuevo evento", `
+    ${Field("Título *","f_titulo","text",f.titulo||"","",true)}
+    <div class="field">
+      <label>Tipo</label>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px">
+        ${TIPOS_EVENTO.map(t=>`<button onclick="setState({form:{...STATE.form,tipo:'${t.label}'}})" class="tap"
+          style="padding:8px 6px;border-radius:10px;border:2px solid ${(f.tipo||'Reunión')===t.label?t.color:'#E4E8F0'};background:${(f.tipo||'Reunión')===t.label?t.color+'18':'#fff'};color:${(f.tipo||'Reunión')===t.label?t.color:'#6B7280'};font-weight:700;font-size:11px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;font-family:Nunito,sans-serif">
+          <span style="font-size:18px">${t.icon}</span>${t.label}
+        </button>`).join("")}
+      </div>
+    </div>
+    ${Field("Fecha *","f_fecha","date",f.fecha||hoy())}
+    <div class="grid2">
+      ${Field("Hora inicio","f_hora","time",f.hora||"")}
+      ${Field("Hora fin","f_horaFin","time",f.horaFin||"")}
+    </div>
+    ${Field("Lugar","f_lugar","text",f.lugar||"")}
+    ${Field("Para quién","f_profesional","text",f.profesional||"",PROFS_EV)}
+    ${Field("Descripción / Notas","f_descripcion","textarea",f.descripcion||"")}
+    <div style="display:flex;gap:10px;padding-top:4px">
+      <button onclick="closeSheet()" class="btn btn-ghost tap" style="flex:1;justify-content:center">Cancelar</button>
+      <button onclick="guardarEvento()" class="btn btn-primary tap" style="flex:2;justify-content:center">Guardar</button>
+    </div>`);
+}
+
+// ═══════════════════════════════════════════════════════
+// BUILD APP
+// ═══════════════════════════════════════════════════════
+function buildApp(){
+  const contentPad = STATE.tab==="inicio" ? "14px 14px 20px" : "14px 14px 86px";
+  let content = "";
+  switch(STATE.tab){
+    case "inicio":         content = buildInicio(); break;
+    case "usuarios":       content = buildUsuarios(); break;
+    case "intervenciones": content = buildIntervenciones(); break;
+    case "atenciones":     content = buildAtenciones(); break;
+    case "seguimiento":    content = buildSeguimiento(); break;
+    case "institucional":  content = buildInstitucional(); break;
+    case "legajo":         content = buildLegajo(); break;
+    case "mapa":           content = buildMapa(); break;
+    case "calendario":     content = buildCalendario(); break;
+  }
+  return `
+    ${buildTopbar()}
+    <div class="content" style="padding:${contentPad};overflow-y:auto;flex:1">${content}</div>
+    ${buildBottomNav()}`;
+}
+
+// ═══════════════════════════════════════════════════════
+// ACTIONS
+// ═══════════════════════════════════════════════════════
+function openSheet(tipo, id){
+  let form = {};
+  if(tipo==="usuarioNuevo")      form = {nombre:"",dni:"",telefono:"",email:"",direccion:"",fechaNac:"",fechaAlta:hoy(),cud:"No",cudFoto:"",notas:""};
+  if(tipo==="usuarioEdit")       { const u=STATE.usuarios.find(u=>u.id==id); form={...u}; }
+  if(tipo==="intervencionNueva") form = {titulo:"",usuarioId:"",categoria:"",subCategoria:"",fechaInicio:hoy(),profesional:"",descripcion:"",_busqModo:"nombre",_busqQ:""};
+  if(tipo==="intervencionEdit")  { const i=STATE.intervenciones.find(i=>i.id==id); form={...i,_busqModo:"nombre",_busqQ:""}; }
+  if(tipo==="atencionNueva")     form = {intervencionId:"",usuarioId:"",fecha:STATE.fechaAten,tipo:"Presencial",profesional:"",duracion:30,descripcion:"",accionesSiguientes:""};
+  if(tipo==="atencionEdit")      { const a=STATE.atenciones.find(a=>a.id==id); form={...a}; }
+  if(tipo==="reunionNueva")      form = {titulo:"",tipo:"Reunión de equipo",fecha:hoy(),lugar:"",participantes:[],situaciones:[],temas:"",acuerdos:"",observaciones:""};
+  if(tipo==="reunionEdit")       { const r=STATE.reuniones.find(r=>r.id==id); form={...r,participantes:[...(r.participantes||[])],situaciones:[...(r.situaciones||[])]}; }
+  if(tipo==="eventoNuevo")       form = {titulo:"",fecha:hoy(),hora:"",horaFin:"",tipo:"Reunión",lugar:"",profesional:"Todo el equipo",descripcion:""};
+  if(tipo==="eventoNuevoDia")    { const fecha=`${STATE.calYear}-${String(STATE.calMonth+1).padStart(2,"0")}-${String(STATE.calDia).padStart(2,"0")}`; form={titulo:"",fecha,hora:"",horaFin:"",tipo:"Reunión",lugar:"",profesional:"Todo el equipo",descripcion:""}; }
+  if(tipo==="eventoEdit")        { const e=STATE.eventos.find(e=>e.id==id); form={...e}; }
+  setState({sheet:tipo,form});
+}
+
+function openDetalle(tipo,id){
+  setState({detail:id,sheet:null});
+}
+
+function getFormValues(){
+  const inputs = document.querySelectorAll('[id^="f_"]');
+  const vals = {};
+  inputs.forEach(el=>{ vals[el.id.replace("f_","")] = el.value; });
+  return vals;
+}
+
+function guardarUsuario(){
+  const v = getFormValues();
+  if(!v.nombre?.trim()) return alert("El nombre es obligatorio");
+  const f = {...STATE.form,...v};
+  if(f.id){
+    STATE.usuarios = STATE.usuarios.map(u=>u.id==f.id?f:u);
+    syncSheet("usuarios","update",f);
+    setState({usuarios:STATE.usuarios,sheet:null,detail:f.id});
+  } else {
+    f.id = newId(STATE.usuarios);
+    STATE.usuarios = [...STATE.usuarios,f];
+    syncSheet("usuarios","insert",f);
+    setState({usuarios:STATE.usuarios,sheet:null});
+  }
+}
+
+function eliminarUsuario(id){
+  if(!confirm("¿Eliminar usuario?")) return;
+  syncSheet("usuarios","delete",null,id);
+  setState({usuarios:STATE.usuarios.filter(u=>u.id!=id),detail:null});
+}
+
+function guardarIntervencion(){
+  const v = getFormValues();
+  if(!v.titulo?.trim()) return alert("El título es obligatorio");
+  const f = {...STATE.form,...v,usuarioId:Number(STATE.form.usuarioId)||0};
+  delete f._busqModo; delete f._busqQ;
+  if(f.id){
+    STATE.intervenciones = STATE.intervenciones.map(i=>i.id==f.id?f:i);
+    syncSheet("intervenciones","update",f);
+    setState({intervenciones:STATE.intervenciones,sheet:null,detail:f.id});
+  } else {
+    f.id = newId(STATE.intervenciones);
+    STATE.intervenciones = [...STATE.intervenciones,f];
+    syncSheet("intervenciones","insert",f);
+    setState({intervenciones:STATE.intervenciones,sheet:null});
+  }
+}
+
+function eliminarIntervencion(id){
+  if(!confirm("¿Eliminar intervención?")) return;
+  syncSheet("intervenciones","delete",null,id);
+  setState({intervenciones:STATE.intervenciones.filter(i=>i.id!=id),detail:null});
+}
+
+function guardarAtencion(){
+  const v = getFormValues();
+  if(!v.descripcion?.trim()) return alert("La descripción es obligatoria");
+  // Map intervención by title
+  const intTitulo = v.intervencionId;
+  const intObj = STATE.intervenciones.find(i=>i.titulo===intTitulo||i.id==intTitulo);
+  const f = {...STATE.form,...v,intervencionId:intObj?intObj.id:0,usuarioId:intObj?intObj.usuarioId:0,duracion:Number(v.duracion)||0};
+  if(f.id){
+    STATE.atenciones = STATE.atenciones.map(a=>a.id==f.id?f:a);
+    syncSheet("atenciones","update",f);
+    setState({atenciones:STATE.atenciones,sheet:null});
+  } else {
+    f.id = newId(STATE.atenciones);
+    STATE.atenciones = [...STATE.atenciones,f];
+    syncSheet("atenciones","insert",f);
+    setState({atenciones:STATE.atenciones,sheet:null});
+  }
+}
+
+function eliminarAtencion(id){
+  if(!confirm("¿Eliminar atención?")) return;
+  syncSheet("atenciones","delete",null,id);
+  setState({atenciones:STATE.atenciones.filter(a=>a.id!=id)});
+}
+
+function guardarReunion(){
+  const v = getFormValues();
+  if(!v.titulo?.trim()) return alert("El título es obligatorio");
+  const f = {...STATE.form,...v};
+  if(f.id){
+    STATE.reuniones = STATE.reuniones.map(r=>r.id==f.id?f:r);
+    syncSheet("reuniones","update",f);
+    setState({reuniones:STATE.reuniones,sheet:null,detail:f.id});
+  } else {
+    f.id = newId(STATE.reuniones);
+    STATE.reuniones = [...STATE.reuniones,f];
+    syncSheet("reuniones","insert",f);
+    setState({reuniones:STATE.reuniones,sheet:null});
+  }
+}
+
+function eliminarReunion(id){
+  if(!confirm("¿Eliminar reunión?")) return;
+  syncSheet("reuniones","delete",null,id);
+  setState({reuniones:STATE.reuniones.filter(r=>r.id!=id),detail:null});
+}
+
+function addParticipante(){
+  const nombre = STATE.partNombre.trim() || (document.getElementById("inp_partNombre")||{}).value?.trim();
+  if(!nombre) return;
+  const parts = [...(STATE.form.participantes||[]),{nombre}];
+  setState({form:{...STATE.form,participantes:parts},partNombre:""});
+}
+
+function removeParticipante(idx){
+  const parts = (STATE.form.participantes||[]).filter((_,i)=>i!==idx);
+  setState({form:{...STATE.form,participantes:parts}});
+}
+
+function addSituacion(){
+  const nombre = STATE.sitNombre.trim() || (document.getElementById("inp_sitNombre")||{}).value?.trim();
+  const dni    = STATE.sitDni.trim()    || (document.getElementById("inp_sitDni")||{}).value?.trim();
+  if(!nombre) return;
+  const match = dni ? STATE.usuarios.find(u=>u.dni===dni) : null;
+  const sits = [...(STATE.form.situaciones||[]),{nombre,dni,usuarioId:match?match.id:null}];
+  setState({form:{...STATE.form,situaciones:sits},sitNombre:"",sitDni:""});
+}
+
+function removeSituacion(idx){
+  const sits = (STATE.form.situaciones||[]).filter((_,i)=>i!==idx);
+  setState({form:{...STATE.form,situaciones:sits}});
+}
+
+function guardarEvento(){
+  const v = getFormValues();
+  if(!v.titulo?.trim()) return alert("El título es obligatorio");
+  const f = {...STATE.form,...v};
+  if(f.id){
+    STATE.eventos = STATE.eventos.map(e=>e.id==f.id?f:e);
+    syncSheet("eventos","update",f);
+    setState({eventos:STATE.eventos,sheet:null});
+  } else {
+    f.id = newId(STATE.eventos);
+    STATE.eventos = [...STATE.eventos,f];
+    syncSheet("eventos","insert",f);
+    setState({eventos:STATE.eventos,sheet:null});
+  }
+}
+
+function eliminarEvento(id){
+  if(!confirm("¿Eliminar evento?")) return;
+  syncSheet("eventos","delete",null,id);
+  setState({eventos:STATE.eventos.filter(e=>e.id!=id)});
+}
+
+function shiftDay(d){
+  const dt = new Date(STATE.fechaAten+"T12:00");
+  dt.setDate(dt.getDate()+d);
+  setState({fechaAten:dt.toISOString().slice(0,10)});
+}
+
+function navMes(d){
+  let m = STATE.calMonth + d;
+  let y = STATE.calYear;
+  if(m<0){m=11;y--;}
+  if(m>11){m=0;y++;}
+  setState({calMonth:m,calYear:y,calDia:null});
+}
+
+function loadCudPhoto(input){
+  const file = input.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => setState({form:{...STATE.form,cudFoto:ev.target.result}});
+  reader.readAsDataURL(file);
+}
+
+function abrirMapa(){
+  const puntos = STATE.usuarios.filter(u=>{
+    if(!u.direccion) return false;
+    if(!STATE.mapaCat) return STATE.intervenciones.some(i=>i.usuarioId===u.id);
+    return STATE.intervenciones.some(i=>i.usuarioId===u.id&&i.categoria===STATE.mapaCat);
+  });
+  if(!puntos.length) return alert("No hay usuarios con dirección registrada para este filtro.");
+  if(puntos.length===1){
+    window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(puntos[0].direccion+", Murphy, Santa Fe, CP 2601")}`, "_blank");
+    return;
+  }
+  const listaHTML = puntos.map(p=>{
+    const cats = [...new Set(STATE.intervenciones.filter(i=>i.usuarioId===p.id&&(!STATE.mapaCat||i.categoria===STATE.mapaCat)).map(i=>i.categoria))];
+    return `<div style="background:#fff;border-radius:10px;padding:12px;box-shadow:0 1px 4px rgba(0,0,0,.07);margin-bottom:8px">
+      <div style="font-weight:700;font-size:14px;margin-bottom:3px">${p.nombre}</div>
+      <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.direccion+", Murphy, Santa Fe, CP 2601")}" target="_blank" style="font-size:12px;color:#2563EB;text-decoration:none;display:block;margin-bottom:5px">📍 ${p.direccion} →</a>
+      <div style="display:flex;flex-wrap:wrap;gap:3px">${cats.map(c=>`<span style="background:${catColor(c)}22;color:${catColor(c)};border-radius:12px;padding:2px 7px;font-size:11px;font-weight:700">${c}</span>`).join("")}</div>
+    </div>`;
+  }).join("");
+  const html=`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Mapa territorial</title>
+  <style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:Arial,sans-serif;background:#f4f6fa}
+  header{background:#064e3b;color:#fff;padding:14px 16px;display:flex;align-items:center;justify-content:space-between}
+  header h1{font-size:17px}iframe{width:100%;height:42vh;border:none;display:block}
+  .lista{padding:14px}.aviso{text-align:center;font-size:12px;color:#9ca3af;padding:6px;margin-bottom:8px}</style>
+  </head><body>
+  <header><h1>🗺 Mapa territorial</h1><span>Murphy, Santa Fe</span></header>
+  <iframe src="https://maps.google.com/maps?q=${encodeURIComponent("Murphy, Santa Fe, CP 2601")}&output=embed&z=15" allowfullscreen loading="lazy"></iframe>
+  <div class="lista"><div class="aviso">Tocá cada dirección para abrirla en Maps · ${puntos.length} usuarios · Filtro: ${STATE.mapaCat||"Todas las categorías"}</div>${listaHTML}</div>
+  </body></html>`;
+  const w=window.open("","_blank"); w.document.write(html); w.document.close();
+}
+
+function imprimirLegajo(uid){
+  const u = STATE.usuarios.find(u=>u.id==uid);
+  if(!u) return;
+  const ints  = STATE.intervenciones.filter(i=>i.usuarioId===u.id);
+  const ates  = STATE.atenciones.filter(a=>a.usuarioId===u.id);
+  const reuns = STATE.reuniones.filter(r=>(r.situaciones||[]).some(s=>s.usuarioId===u.id||(s.dni&&u.dni&&s.dni===u.dni)));
+  let html=`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>Legajo — ${u.nombre}</title>
+  <style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:Arial,sans-serif;font-size:13px;color:#111;padding:32px 40px;max-width:800px;margin:0 auto}
+  h1{font-size:22px;color:#1e3a5f;margin-bottom:4px}.sub{font-size:12px;color:#6b7280;margin-bottom:20px}
+  hr{border:none;border-top:3px solid #2563eb;margin:16px 0}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:4px 20px}
+  .fila{display:flex;gap:6px;padding:5px 0;border-bottom:1px solid #f0f0f0}.lbl{font-weight:700;color:#1e3a5f;min-width:120px;flex-shrink:0}
+  .sec{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:#6b7280;background:#f3f4f6;padding:5px 10px;border-radius:6px;margin:20px 0 10px}
+  .card{border:1px solid #e4e8f0;border-radius:8px;padding:12px;margin-bottom:8px}.card-titulo{font-weight:700;font-size:14px;margin-bottom:5px}
+  .badge{display:inline-block;border-radius:12px;padding:2px 8px;font-size:11px;font-weight:700;margin:2px}
+  .accion{background:#fffbeb;border-left:3px solid #d97706;padding:6px 10px;font-size:12px;color:#92400e;margin-top:6px;border-radius:0 4px 4px 0}
+  .acuerdo{background:#ecfdf5;border-left:3px solid #059669;padding:6px 10px;font-size:12px;color:#065f46;margin-top:6px;border-radius:0 4px 4px 0}
+  .empty{color:#9ca3af;font-style:italic;padding:6px 0}
+  .footer{margin-top:36px;border-top:1px solid #e4e8f0;padding-top:10px;font-size:11px;color:#9ca3af;text-align:center}
+  .print-btn{float:right;background:#2563eb;color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:8px}
+  @media print{.print-btn{display:none}}</style></head><body>
+  <button class="print-btn" onclick="window.print()">🖨 Imprimir / PDF</button>
+  <h1>Legajo de usuario</h1>
+  <div class="sub">Equipo de Acción Social · Murphy, Santa Fe, CP 2601 · Generado el ${fmtDateL(hoy())}</div>
+  <hr>
+  <div class="sec">👤 Datos personales</div>
+  <div class="grid">
+    <div class="fila"><span class="lbl">Nombre:</span><span>${u.nombre||"—"}</span></div>
+    <div class="fila"><span class="lbl">DNI / NIE:</span><span>${u.dni||"—"}</span></div>
+    <div class="fila"><span class="lbl">F. Nacimiento:</span><span>${u.fechaNac?fmtDateL(u.fechaNac):"—"}</span></div>
+    <div class="fila"><span class="lbl">Teléfono:</span><span>${u.telefono||"—"}</span></div>
+    <div class="fila"><span class="lbl">Email:</span><span>${u.email||"—"}</span></div>
+    <div class="fila"><span class="lbl">Dirección:</span><span>${u.direccion||"—"}</span></div>
+    <div class="fila"><span class="lbl">Alta:</span><span>${fmtDateL(u.fechaAlta)}</span></div>
+    <div class="fila"><span class="lbl">CUD:</span><span>${u.cud==="Sí"?"♿ Sí":"No"}</span></div>
+  </div>
+  ${u.notas?`<div class="card" style="background:#fffbeb;border-color:#fcd34d;margin-top:10px"><strong>Notas:</strong> ${u.notas}</div>`:""}`;
+
+  html+=`<div class="sec">📋 Intervenciones (${ints.length})</div>`;
+  if(!ints.length) html+=`<p class="empty">Sin intervenciones registradas</p>`;
+  else ints.forEach(i=>{
+    const nA=STATE.atenciones.filter(a=>a.intervencionId===i.id).length;
+    html+=`<div class="card"><div class="card-titulo">${i.titulo}</div>
+      <span class="badge" style="background:${catColor(i.categoria)}22;color:${catColor(i.categoria)}">${i.categoria}</span>
+      ${i.subCategoria?`<span class="badge" style="background:#f3f4f6;color:#6b7280">${i.subCategoria}</span>`:""}
+      <span class="badge" style="background:#f3f4f6;color:#6b7280">📅 ${fmtDateL(i.fechaInicio)}</span>
+      <span class="badge" style="background:#f3f4f6;color:#6b7280">🧑 ${i.profesional||"—"}</span>
+      <span class="badge" style="background:#eff4ff;color:#2563eb">${nA} atenciones</span>
+      ${i.descripcion?`<p style="margin-top:6px;color:#374151;line-height:1.5">${i.descripcion}</p>`:""}
+    </div>`;
+  });
+
+  html+=`<div class="sec">📅 Atenciones (${ates.length})</div>`;
+  if(!ates.length) html+=`<p class="empty">Sin atenciones registradas</p>`;
+  else [...ates].sort((a,b)=>b.fecha.localeCompare(a.fecha)).forEach(a=>{
+    const int=STATE.intervenciones.find(i=>i.id===a.intervencionId);
+    html+=`<div class="card">
+      <span class="badge" style="background:#eff4ff;color:#2563eb">${fmtDateL(a.fecha)}</span>
+      <span class="badge" style="background:#f3f4f6;color:#6b7280">${a.tipo}</span>
+      <span class="badge" style="background:#f3f4f6;color:#6b7280">${a.duracion} min</span>
+      <span class="badge" style="background:#f3f4f6;color:#6b7280">🧑 ${a.profesional||"—"}</span>
+      ${int?`<span class="badge" style="background:${catColor(int.categoria)}22;color:${catColor(int.categoria)}">${int.categoria}</span>`:""}
+      <p style="margin-top:6px;color:#374151;line-height:1.5">${a.descripcion}</p>
+      ${a.accionesSiguientes?`<div class="accion">→ ${a.accionesSiguientes}</div>`:""}
+    </div>`;
+  });
+
+  html+=`<div class="sec">🏛 Reuniones institucionales (${reuns.length})</div>`;
+  if(!reuns.length) html+=`<p class="empty">Sin reuniones registradas</p>`;
+  else [...reuns].sort((a,b)=>b.fecha.localeCompare(a.fecha)).forEach(r=>{
+    html+=`<div class="card"><div class="card-titulo">${r.titulo}</div>
+      <span class="badge" style="background:#eff4ff;color:#2563eb">${r.tipo}</span>
+      <span class="badge" style="background:#f3f4f6;color:#6b7280">${fmtDateL(r.fecha)}</span>
+      ${r.lugar?`<span class="badge" style="background:#f3f4f6;color:#6b7280">📍 ${r.lugar}</span>`:""}
+      ${r.temas?`<p style="margin-top:6px;color:#374151;line-height:1.5"><strong>Temas:</strong> ${r.temas}</p>`:""}
+      ${r.acuerdos?`<div class="acuerdo">✓ ${r.acuerdos}</div>`:""}
+    </div>`;
+  });
+
+  html+=`<div class="footer">Legajo · DNI: ${u.dni||"—"} · ${fmtDateL(hoy())}</div></body></html>`;
+  const w=window.open("","_blank"); w.document.write(html); w.document.close();
+}
+
+// ═══════════════════════════════════════════════════════
+// BIND EVENTS
+// ═══════════════════════════════════════════════════════
+function bindEvents(){
+  // Close sheet on overlay click
+  const overlay = document.getElementById("sheet-overlay");
+  if(overlay) overlay.addEventListener("click",e=>{ if(e.target===overlay||e.target.classList.contains("sheet-bg")) closeSheet(); });
+}
+
+// ═══════════════════════════════════════════════════════
+// PWA MANIFEST
+// ═══════════════════════════════════════════════════════
+const manifest = {
+  name: "Acción Social Murphy",
+  short_name: "Acción Social",
+  description: "Gestión del Equipo de Acción Social - Murphy, Santa Fe, CP 2601",
+  theme_color: "#2563EB",
+  background_color: "#F4F6FA",
+  display: "standalone",
+  orientation: "portrait",
+  start_url: ".",
+  icons: [{src:"data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%232563EB'/><text y='70' x='50' text-anchor='middle' font-size='55' font-family='Arial'>🤝</text></svg>",sizes:"192x192",type:"image/svg+xml"}]
+};
+const blob = new Blob([JSON.stringify(manifest)],{type:"application/json"});
+const mUrl = URL.createObjectURL(blob);
+document.getElementById("manifest-link").href = mUrl;
+
+// ═══════════════════════════════════════════════════════
+// SERVICE WORKER (para instalación como app)
+// ═══════════════════════════════════════════════════════
+if("serviceWorker" in navigator){
+  const swCode = `
+    const CACHE = "accion-social-v1";
+    self.addEventListener("install", e => e.waitUntil(caches.open(CACHE).then(c => c.addAll(["."]))));
+    self.addEventListener("fetch", e => e.respondWith(caches.match(e.request).then(r => r || fetch(e.request))));
+  `;
+  const swBlob = new Blob([swCode],{type:"application/javascript"});
+  const swUrl = URL.createObjectURL(swBlob);
+  navigator.serviceWorker.register(swUrl).catch(()=>{});
+}
+
+
+// ═══════════════════════════════════════════════════════
+// GOOGLE SHEETS SYNC
+// ═══════════════════════════════════════════════════════
+const SHEETS_URL = "https://script.google.com/macros/s/AKfycbzCiOJMZCjkF1o77ArzCLPiZX-0o50uwWjJGjMVdy-H9Pps766mOkrYgti_7hbwl1UC/exec";
+
+async function cargarDatos() {
+  showLoading(true);
+  try {
+    const tabs = ["usuarios","intervenciones","atenciones","reuniones","eventos"];
+    const results = await Promise.all(tabs.map(tab =>
+      fetch(SHEETS_URL + "?tab=" + tab).then(r => r.json()).catch(() => [])
+    ));
+    STATE.usuarios       = results[0].map(normalizar) || [];
+    STATE.intervenciones = results[1].map(normalizar) || [];
+    STATE.atenciones     = results[2].map(normalizar) || [];
+    STATE.reuniones      = results[3].map(r => ({...normalizar(r), participantes: parseLista(r.participantes), situaciones: parseLista(r.situaciones)})) || [];
+    STATE.eventos        = results[4].map(normalizar) || [];
+    showLoading(false);
+    render();
+  } catch(e) {
+    showLoading(false);
+    console.error("Error cargando datos:", e);
+    render();
+  }
+}
+
+function normalizar(obj) {
+  const r = {};
+  for(const k in obj) {
+    const v = obj[k];
+    if(k === "id" || k === "usuarioId" || k === "intervencionId" || k === "duracion") r[k] = Number(v)||0;
+    else r[k] = v === undefined || v === null ? "" : String(v);
+  }
+  return r;
+}
+
+function parseLista(val) {
+  if(!val || val === "") return [];
+  try { return JSON.parse(val); } catch { return []; }
+}
+
+async function syncSheet(tab, action, data, id) {
+  try {
+    // Serialize arrays to JSON strings for Sheets
+    const d = data ? {...data} : null;
+    if(d && d.participantes) d.participantes = JSON.stringify(d.participantes||[]);
+    if(d && d.situaciones)   d.situaciones   = JSON.stringify(d.situaciones||[]);
+    await fetch(SHEETS_URL, {
+      method: "POST",
+      body: JSON.stringify({tab, action, data: d, id})
+    });
+  } catch(e) {
+    console.error("Error sync:", e);
+  }
+}
+
+function showLoading(show) {
+  const el = document.getElementById("loading-overlay");
+  if(el) el.style.display = show ? "flex" : "none";
+}
+
+// ═══════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════
+cargarDatos();
+</script>
+</body>
+</html>
