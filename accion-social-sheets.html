@@ -1184,27 +1184,47 @@ function eliminarReunion(id){
 function addParticipante(){
   const nombre = STATE.partNombre.trim() || (document.getElementById("inp_partNombre")||{}).value.trim();
   if(!nombre) return;
-  const parts = [...(STATE.form.participantes||[]),{nombre}];
-  setState({form:{...STATE.form,participantes:parts},partNombre:""});
+  const _t=(document.getElementById("f_temas")||{}).value||STATE.form.temas||"";
+  const _a=(document.getElementById("f_acuerdos")||{}).value||STATE.form.acuerdos||"";
+  const _o=(document.getElementById("f_observaciones")||{}).value||STATE.form.observaciones||"";
+  const _ti=(document.getElementById("f_titulo")||{}).value||STATE.form.titulo||"";
+  const _l=(document.getElementById("f_lugar")||{}).value||STATE.form.lugar||"";
+  const parts=[...(STATE.form.participantes||[]),{nombre}];
+  setState({form:{...STATE.form,titulo:_ti,lugar:_l,temas:_t,acuerdos:_a,observaciones:_o,participantes:parts},partNombre:""});
 }
 
 function removeParticipante(idx){
+  const _temas         = (document.getElementById("f_temas")||{}).value         || STATE.form.temas||"";
+  const _acuerdos      = (document.getElementById("f_acuerdos")||{}).value      || STATE.form.acuerdos||"";
+  const _observaciones = (document.getElementById("f_observaciones")||{}).value || STATE.form.observaciones||"";
+  const _titulo        = (document.getElementById("f_titulo")||{}).value        || STATE.form.titulo||"";
+  const _lugar         = (document.getElementById("f_lugar")||{}).value         || STATE.form.lugar||"";
   const parts = (STATE.form.participantes||[]).filter((_,i)=>i!==idx);
-  setState({form:{...STATE.form,participantes:parts}});
+  setState({form:{...STATE.form,titulo:_titulo,lugar:_lugar,temas:_temas,acuerdos:_acuerdos,observaciones:_observaciones,participantes:parts}});
 }
 
 function addSituacion(){
   const nombre = STATE.sitNombre.trim() || (document.getElementById("inp_sitNombre")||{}).value.trim();
   const dni    = STATE.sitDni.trim()    || (document.getElementById("inp_sitDni")||{}).value.trim();
+  const _t=(document.getElementById("f_temas")||{}).value||STATE.form.temas||"";
+  const _a=(document.getElementById("f_acuerdos")||{}).value||STATE.form.acuerdos||"";
+  const _o=(document.getElementById("f_observaciones")||{}).value||STATE.form.observaciones||"";
+  const _ti=(document.getElementById("f_titulo")||{}).value||STATE.form.titulo||"";
+  const _l=(document.getElementById("f_lugar")||{}).value||STATE.form.lugar||"";
   if(!nombre) return;
   const match = dni ? STATE.usuarios.find(u=>u.dni===dni) : null;
   const sits = [...(STATE.form.situaciones||[]),{nombre,dni,usuarioId:match?match.id:null}];
-  setState({form:{...STATE.form,situaciones:sits},sitNombre:"",sitDni:""});
+  setState({form:{...STATE.form,titulo:_ti,lugar:_l,temas:_t,acuerdos:_a,observaciones:_o,situaciones:sits},sitNombre:"",sitDni:""});
 }
 
 function removeSituacion(idx){
-  const sits = (STATE.form.situaciones||[]).filter((_,i)=>i!==idx);
-  setState({form:{...STATE.form,situaciones:sits}});
+  const _t=(document.getElementById("f_temas")||{}).value||STATE.form.temas||"";
+  const _a=(document.getElementById("f_acuerdos")||{}).value||STATE.form.acuerdos||"";
+  const _o=(document.getElementById("f_observaciones")||{}).value||STATE.form.observaciones||"";
+  const _ti=(document.getElementById("f_titulo")||{}).value||STATE.form.titulo||"";
+  const _l=(document.getElementById("f_lugar")||{}).value||STATE.form.lugar||"";
+  const sits=(STATE.form.situaciones||[]).filter((_,i)=>i!==idx);
+  setState({form:{...STATE.form,titulo:_ti,lugar:_l,temas:_t,acuerdos:_a,observaciones:_o,situaciones:sits}});
 }
 
 function guardarEvento(){
