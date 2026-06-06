@@ -441,7 +441,7 @@ function buildSheetUsuario(){
     <div class="field">
       <label>♿ Posee CUD</label>
       <div style="display:flex;gap:8px">
-        ${tiposCud.map(op=>`<button onclick="setState({form:{...STATE.form,cud:'${op}'}})" class="tap"
+        ${tiposCud.map(op=>`<button onclick="setState({form:{...saveFormFields(),cud:'${op}'}})" class="tap"
           style="flex:1;padding:9px;border-radius:10px;border:2px solid ${(f.cud||'No')===op?'#7C3AED':'#E4E8F0'};background:${(f.cud||'No')===op?'#F5F3FF':'#fff'};color:${(f.cud||'No')===op?'#7C3AED':'#6B7280'};font-weight:700;font-size:14px;cursor:pointer;font-family:Nunito,sans-serif">${op}</button>`).join("")}
       </div>
       ${(f.cud||"No")==="Sí"?`
@@ -449,7 +449,7 @@ function buildSheetUsuario(){
           <label style="font-size:12px;font-weight:700;color:#6B7280;display:block;margin-bottom:8px">Foto del CUD</label>
           ${f.cudFoto?`<div style="position:relative">
             <img src="${f.cudFoto}" style="width:100%;border-radius:8px;object-fit:contain;max-height:180px;border:1px solid #E4E8F0">
-            <button onclick="setState({form:{...STATE.form,cudFoto:''}})" style="position:absolute;top:6px;right:6px;background:rgba(0,0,0,.5);border:none;border-radius:50%;width:28px;height:28px;color:#fff;font-size:16px;cursor:pointer">×</button>
+            <button onclick="setState({form:{...saveFormFields(),cudFoto:''}})" style="position:absolute;top:6px;right:6px;background:rgba(0,0,0,.5);border:none;border-radius:50%;width:28px;height:28px;color:#fff;font-size:16px;cursor:pointer">×</button>
           </div>`:`<label style="display:flex;flex-direction:column;align-items:center;gap:6px;background:#fff;border:2px dashed #E4E8F0;border-radius:10px;padding:20px;cursor:pointer">
             <span style="font-size:28px">📷</span>
             <span style="font-size:12px;color:#9CA3AF;font-weight:600">Tocar para cargar foto</span>
@@ -573,17 +573,17 @@ function buildSheetIntervencion(){
           <div style="font-weight:800;font-size:14px">${esc(selU.nombre)}</div>
           <div style="font-size:11px;color:#2563EB">DNI: ${esc(selU.dni||"—")}</div>
         </div>
-        <button onclick="setState({form:{...STATE.form,usuarioId:'',_busqQ:''}})" style="background:none;border:none;color:#6B7280;font-size:18px;cursor:pointer">×</button>
+        <button onclick="setState({form:{...saveFormFields(),usuarioId:'',_busqQ:''}})" style="background:none;border:none;color:#6B7280;font-size:18px;cursor:pointer">×</button>
       </div>`:`
         <div style="display:flex;gap:8px;margin-bottom:6px">
-          <button onclick="setState({form:{...STATE.form,_busqModo:'nombre'}})" class="tap" style="flex:1;padding:7px;border-radius:8px;border:1.5px solid ${busqModo==='nombre'?'#2563EB':'#E4E8F0'};background:${busqModo==='nombre'?'#EFF4FF':'#fff'};color:${busqModo==='nombre'?'#2563EB':'#6B7280'};font-weight:700;font-size:12px;cursor:pointer;font-family:Nunito,sans-serif">👤 Por nombre</button>
-          <button onclick="setState({form:{...STATE.form,_busqModo:'dni'}})" class="tap" style="flex:1;padding:7px;border-radius:8px;border:1.5px solid ${busqModo==='dni'?'#2563EB':'#E4E8F0'};background:${busqModo==='dni'?'#EFF4FF':'#fff'};color:${busqModo==='dni'?'#2563EB':'#6B7280'};font-weight:700;font-size:12px;cursor:pointer;font-family:Nunito,sans-serif">🪪 Por DNI</button>
+          <button onclick="setState({form:{...saveFormFields(),_busqModo:'nombre'}})" class="tap" style="flex:1;padding:7px;border-radius:8px;border:1.5px solid ${busqModo==='nombre'?'#2563EB':'#E4E8F0'};background:${busqModo==='nombre'?'#EFF4FF':'#fff'};color:${busqModo==='nombre'?'#2563EB':'#6B7280'};font-weight:700;font-size:12px;cursor:pointer;font-family:Nunito,sans-serif">👤 Por nombre</button>
+          <button onclick="setState({form:{...saveFormFields(),_busqModo:'dni'}})" class="tap" style="flex:1;padding:7px;border-radius:8px;border:1.5px solid ${busqModo==='dni'?'#2563EB':'#E4E8F0'};background:${busqModo==='dni'?'#EFF4FF':'#fff'};color:${busqModo==='dni'?'#2563EB':'#6B7280'};font-weight:700;font-size:12px;cursor:pointer;font-family:Nunito,sans-serif">🪪 Por DNI</button>
         </div>
         <div style="position:relative">
           <input value="${esc(busqQ)}" oninput="setState({form:{...STATE.form,_busqQ:this.value}})" placeholder="${busqModo==='nombre'?'Escribir nombre…':'Escribir DNI…'}"
             style="width:100%;background:#F9FAFB;border:1.5px solid #E4E8F0;border-radius:10px;color:#111827;padding:10px 12px;font-size:14px;font-family:Nunito,sans-serif">
           ${busqRes.length>0?`<div style="position:absolute;top:calc(100% + 4px);left:0;right:0;background:#fff;border:1.5px solid #E4E8F0;border-radius:12px;box-shadow:0 6px 24px rgba(0,0,0,.12);z-index:50;overflow:hidden">
-            ${busqRes.map(u=>`<button onclick="setState({form:{...STATE.form,usuarioId:${u.id},_busqQ:''}})" class="tap" style="display:flex;align-items:center;gap:10px;width:100%;padding:10px 14px;background:transparent;border:none;border-bottom:1px solid #E4E8F0;text-align:left;cursor:pointer;font-family:Nunito,sans-serif">
+            ${busqRes.map(u=>`<button onclick="setState({form:{...saveFormFields(),usuarioId:${u.id},_busqQ:''}})" class="tap" style="display:flex;align-items:center;gap:10px;width:100%;padding:10px 14px;background:transparent;border:none;border-bottom:1px solid #E4E8F0;text-align:left;cursor:pointer;font-family:Nunito,sans-serif">
               ${Avatar(u.nombre,32,"#7C3AED")}
               <div style="flex:1;min-width:0">
                 <div style="font-weight:700;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(u.nombre)}</div>
@@ -1029,7 +1029,7 @@ function buildSheetEvento(){
     <div class="field">
       <label>Tipo</label>
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px">
-        ${TIPOS_EVENTO.map(t=>`<button onclick="setState({form:{...STATE.form,tipo:'${t.label}'}})" class="tap"
+        ${TIPOS_EVENTO.map(t=>`<button onclick="setState({form:{...saveFormFields(),tipo:'${t.label}'}})" class="tap"
           style="padding:8px 6px;border-radius:10px;border:2px solid ${(f.tipo||'Reunión')===t.label?t.color:'#E4E8F0'};background:${(f.tipo||'Reunión')===t.label?t.color+'18':'#fff'};color:${(f.tipo||'Reunión')===t.label?t.color:'#6B7280'};font-weight:700;font-size:11px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;font-family:Nunito,sans-serif">
           <span style="font-size:18px">${t.icon}</span>${t.label}
         </button>`).join("")}
@@ -1590,7 +1590,7 @@ function buildSheetInforme(){
     <div style="background:#EFF4FF;border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:#0369A1;font-weight:600">📝 Informe Socioambiental · Área de Desarrollo Social · Murphy, Santa Fe</div>
     <div style="font-size:12px;font-weight:800;color:#0369A1;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">👤 Datos del solicitante</div>
     <div class="field"><label>Vincular con usuario registrado (opcional)</label>
-      ${selU?`<div style="display:flex;align-items:center;gap:10px;background:#EFF4FF;border:1.5px solid #2563EB;border-radius:10px;padding:9px 14px;margin-bottom:6px"><div style="flex:1"><div style="font-weight:800;font-size:14px">${esc(selU.nombre)}</div><div style="font-size:11px;color:#2563EB">DNI: ${esc(selU.dni||"—")}</div></div><button onclick="setState({form:{...STATE.form,usuarioId:''}})" style="background:none;border:none;color:#6B7280;font-size:18px;cursor:pointer">×</button></div>`:`<select onchange="setState({form:{...STATE.form,usuarioId:this.value}})" style="background:#F9FAFB;border:1.5px solid #E4E8F0;border-radius:10px;color:#111827;padding:10px 12px;font-size:14px;width:100%;font-family:Nunito,sans-serif;margin-bottom:6px"><option value="">Sin vinculación / cargar manualmente</option>${STATE.usuarios.map(u=>`<option value="${u.id}" ${f.usuarioId==u.id?"selected":""}>${esc(u.nombre)} — DNI: ${esc(u.dni||"—")}</option>`).join("")}</select>`}
+      ${selU?`<div style="display:flex;align-items:center;gap:10px;background:#EFF4FF;border:1.5px solid #2563EB;border-radius:10px;padding:9px 14px;margin-bottom:6px"><div style="flex:1"><div style="font-weight:800;font-size:14px">${esc(selU.nombre)}</div><div style="font-size:11px;color:#2563EB">DNI: ${esc(selU.dni||"—")}</div></div><button onclick="setState({form:{...saveFormFields(),usuarioId:''}})" style="background:none;border:none;color:#6B7280;font-size:18px;cursor:pointer">×</button></div>`:`<select onchange="setState({form:{...saveFormFields(),usuarioId:this.value}})" style="background:#F9FAFB;border:1.5px solid #E4E8F0;border-radius:10px;color:#111827;padding:10px 12px;font-size:14px;width:100%;font-family:Nunito,sans-serif;margin-bottom:6px"><option value="">Sin vinculación / cargar manualmente</option>${STATE.usuarios.map(u=>`<option value="${u.id}" ${f.usuarioId==u.id?"selected":""}>${esc(u.nombre)} — DNI: ${esc(u.dni||"—")}</option>`).join("")}</select>`}
     </div>
     ${Field("Nombre y apellido *","f_nombre","text",f.nombre||(selU&&selU.nombre)||"","",true)}
     <div class="grid2">${Field("DNI","f_dni","text",f.dni||(selU&&selU.dni)||"")}${Field("Fecha de nacimiento","f_fechaNac","date",f.fechaNac||(selU&&selU.fechaNac)||"")}</div>
@@ -1756,6 +1756,17 @@ function imprimirInforme(id){
   const w=window.open("","_blank"); w.document.write(doc); w.document.close();
 }
 
+
+// ─── Preserva los valores de todos los campos del formulario antes de re-renderizar
+function saveFormFields(){
+  const saved = {...STATE.form};
+  document.querySelectorAll('[id^="f_"]').forEach(el=>{
+    const key = el.id.replace('f_','');
+    if(el.type==='checkbox') saved[key] = el.checked;
+    else saved[key] = el.value;
+  });
+  return saved;
+}
 // ═══════════════════════════════════════════════════════
 // BIND EVENTS
 // ═══════════════════════════════════════════════════════
