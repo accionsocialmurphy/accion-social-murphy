@@ -87,13 +87,13 @@ textarea{resize:vertical}
 // ═══════════════════════════════════════════════════════
 // DATOS Y CONSTANTES
 // ═══════════════════════════════════════════════════════
-const CATS = ["Vivienda","Económica","Laboral","Familiar","Salud","Educación","Trámites","Consumo problemático","Equipo de Niñez","Consultorio de Escucha Niñez","Talleres Centro de Día","Derivación a Equipo de Género","Traslados","Salud Mental","Pago de Servicios","Otros"];
+const CATS = ["Vivienda","Económica","Laboral","Familiar","Salud","Educación","Trámites","Consumo problemático","Equipo de Niñez","Consultorio de Escucha Niñez","Talleres Centro de Día","Derivación a Equipo de Género","Traslados","Salud Mental","Pago de Servicios","Servicios","Bono de mercadería","Otros"];
 const SUBCATS = {"Salud":["Análisis","Ecografía","Medicación","Ayuda Excepcional"]};
 const TIPOS_ATENCION = ["Presencial","Telefónica","Domiciliaria","Telemática"];
 const PROFS = ["Biolatto Eliana","Compagnucci Natalia","Gateu Sofía","Quinteros Anabella","Rubio María Celeste"];
 const TIPOS_REUNION = ["Reunión de equipo","Reunión interinstitucional","Capacitación","Supervisión","Otra"];
 const TIPOS_EVENTO = [{label:"Reunión",color:"#2563EB",icon:"🤝"},{label:"Visita",color:"#059669",icon:"🏠"},{label:"Trámite",color:"#D97706",icon:"📄"},{label:"Capacitación",color:"#7C3AED",icon:"📚"},{label:"Recordatorio",color:"#DC2626",icon:"🔔"},{label:"Otro",color:"#6B7280",icon:"📌"}];
-const CAT_COLORS = {"Vivienda":"#2563EB","Económica":"#059669","Laboral":"#D97706","Familiar":"#7C3AED","Salud":"#DC2626","Educación":"#0891B2","Trámites":"#475569","Consumo problemático":"#B45309","Equipo de Niñez":"#0D9488","Consultorio de Escucha Niñez":"#0E7490","Talleres Centro de Día":"#6D28D9","Derivación a Equipo de Género":"#DB2777","Traslados":"#0369A1","Salud Mental":"#7C3AED","Pago de Servicios":"#059669","Otros":"#6B7280"};
+const CAT_COLORS = {"Vivienda":"#2563EB","Económica":"#059669","Laboral":"#D97706","Familiar":"#7C3AED","Salud":"#DC2626","Educación":"#0891B2","Trámites":"#475569","Consumo problemático":"#B45309","Equipo de Niñez":"#0D9488","Consultorio de Escucha Niñez":"#0E7490","Talleres Centro de Día":"#6D28D9","Derivación a Equipo de Género":"#DB2777","Traslados":"#0369A1","Salud Mental":"#7C3AED","Pago de Servicios":"#059669","Servicios":"#0891B2","Bono de mercadería":"#B45309","Otros":"#6B7280"};
 const CIUDAD = "Murphy, Santa Fe, CP 2601";
 const MESES = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
 const DIAS_CORTO = ["Dom","Lun","Mar","Mié","Jue","Vie","Sáb"];
@@ -217,7 +217,7 @@ function closeSheet(){ setState({sheet:null,form:{},partNombre:"",sitNombre:"",s
 // ═══════════════════════════════════════════════════════
 // TOPBAR
 // ═══════════════════════════════════════════════════════
-const LABEL = {inicio:"Inicio",usuarios:"Usuarios",intervenciones:"Intervenciones",atenciones:"Atenciones diarias",seguimiento:"Seguimiento",institucional:"Institucional",legajo:"Legajo",mapa:"Mapa territorial",calendario:"Calendario"};
+const LABEL = {inicio:"Inicio",usuarios:"Usuarios",intervenciones:"Intervenciones",institucional:"Institucional",legajo:"Legajo",mapa:"Mapa territorial",calendario:"Calendario"};
 function buildTopbar(){
   const d = new Date();
   const dayNum = d.toLocaleDateString("es-ES",{day:"numeric"});
@@ -245,8 +245,8 @@ function buildTopbar(){
 // ═══════════════════════════════════════════════════════
 function buildBottomNav(){
   if(STATE.tab==="inicio") return "";
-  const main = [{id:"usuarios",label:"Usuarios",icon:"👥"},{id:"intervenciones",label:"Interv.",icon:"📋"},{id:"atenciones",label:"Atenciones",icon:"📅"}];
-  const more = [{id:"seguimiento",label:"Seguimiento",icon:"🔍"},{id:"institucional",label:"Institucional",icon:"🏛"},{id:"mapa",label:"Mapa",icon:"🗺"},{id:"legajo",label:"Legajo",icon:"📂"},{id:"calendario",label:"Calendario",icon:"🗓"}];
+  const main = [{id:"usuarios",label:"Usuarios",icon:"👥"},{id:"intervenciones",label:"Interv.",icon:"📋"},];
+  const more = [{id:"institucional",label:"Institucional",icon:"🏛"},{id:"mapa",label:"Mapa",icon:"🗺"},{id:"legajo",label:"Legajo",icon:"📂"},{id:"calendario",label:"Calendario",icon:"🗓"}];
   const inMore = more.some(t=>t.id===STATE.tab);
   let html = `<div class="bottomnav">
     <button onclick="goTo('inicio')" class="tap">
@@ -610,160 +610,6 @@ function buildSheetIntervencion(){
 
 // ═══════════════════════════════════════════════════════
 // ATENCIONES
-// ═══════════════════════════════════════════════════════
-function buildAtenciones(){
-  const porFecha = STATE.atenciones.filter(a=>a.fecha===STATE.fechaAten).sort((a,b)=>a.id-b.id);
-  const totalMin = porFecha.reduce((s,a)=>s+(Number(a.duracion)||0),0);
-  return `
-    <div class="scard" style="padding:12px 16px;margin-bottom:14px">
-      <div style="display:flex;align-items:center;gap:8px">
-        <button onclick="shiftDay(-1)" class="tap" style="background:#F4F6FA;border:1px solid #E4E8F0;border-radius:8px;width:36px;height:36px;font-size:20px;color:#6B7280;display:flex;align-items:center;justify-content:center;cursor:pointer">‹</button>
-        <input type="date" value="${STATE.fechaAten}" onchange="setState({fechaAten:this.value})"
-          style="flex:1;background:transparent;border:none;font-size:14px;font-weight:700;color:#111827;text-align:center;font-family:Nunito,sans-serif">
-        <button onclick="shiftDay(1)" class="tap" style="background:#F4F6FA;border:1px solid #E4E8F0;border-radius:8px;width:36px;height:36px;font-size:20px;color:#6B7280;display:flex;align-items:center;justify-content:center;cursor:pointer">›</button>
-      </div>
-    </div>
-    <div class="grid2" style="margin-bottom:14px">
-      ${SCard(`<div style="text-align:center"><div style="font-size:28px;font-weight:800;color:#2563EB">${porFecha.length}</div><div style="font-size:11px;color:#6B7280;font-weight:600">Atenciones</div></div>`,"padding:12px")}
-      ${SCard(`<div style="text-align:center"><div style="font-size:28px;font-weight:800;color:#059669">${totalMin}</div><div style="font-size:11px;color:#6B7280;font-weight:600">Minutos</div></div>`,"padding:12px")}
-    </div>
-    <button onclick="openSheet('atencionNueva')" class="btn btn-primary btn-full tap" style="margin-bottom:8px">+ Registrar atención</button>
-    ${porFecha.length>0?`<button onclick="imprimirAtencionesDia()" class="btn btn-full tap" style="margin-bottom:14px;background:#1e3a5f;color:#fff;border:none">🖨 Imprimir atenciones del día (${porFecha.length})</button>`:`<div style="margin-bottom:14px"></div>`}
-    <div style="display:flex;flex-direction:column;gap:8px">
-      ${porFecha.length===0?SCard('<p style="color:#9CA3AF;text-align:center;font-size:13px;padding:8px 0">Sin atenciones este día</p>'):""}
-      ${porFecha.map(a=>{
-        const u = STATE.usuarios.find(u=>u.id===a.usuarioId);
-        const i = STATE.intervenciones.find(i=>i.id===a.intervencionId);
-        return SCard(`
-          <div style="display:flex;gap:12px;align-items:flex-start">
-            ${Avatar(u?.nombre||"?",40,"#7C3AED")}
-            <div style="flex:1;min-width:0">
-              <div style="font-weight:800;font-size:14px;margin-bottom:4px">${esc(u?.nombre||"—")}</div>
-              <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">
-                ${Badge(a.tipo,"#EFF4FF","#2563EB")}
-                ${Badge(a.duracion+" min","#F3F4F6","#6B7280")}
-                ${i?CatChip(i.categoria):""}
-              </div>
-              <p style="font-size:12px;line-height:1.5">${esc(a.descripcion)}</p>
-              ${a.accionesSiguientes?`<div style="margin-top:8px;background:#FFFBEB;border-radius:8px;padding:7px 10px;font-size:11px;color:#D97706;font-weight:700">→ ${esc(a.accionesSiguientes)}</div>`:""}
-              <div style="display:flex;gap:8px;margin-top:10px">
-                <button onclick="openSheet('atencionEdit','${a.id}')" class="btn btn-ghost tap" style="font-size:11px;padding:5px 10px">✏️ Editar</button>
-                <button onclick="eliminarAtencion('${a.id}')" class="btn btn-danger tap" style="font-size:11px;padding:5px 10px">🗑</button>
-              </div>
-            </div>
-          </div>`);
-      }).join("")}
-    </div>
-    ${STATE.sheet ? buildSheetAtencion() : ""}`;
-}
-
-function buildSheetAtencion(){
-  const f = STATE.form;
-  const selI = STATE.intervenciones.find(i=>i.id===Number(f.intervencionId));
-  return Sheet(f.id?"Editar atención":"Registrar atención", `
-    <div class="field">
-      <label>Intervención vinculada</label>
-      ${Field("","f_intervencionId","text",f.intervencionId||"",STATE.intervenciones.map(i=>i.titulo))}
-    </div>
-    <div class="grid2">
-      ${Field("Fecha","f_fecha","date",f.fecha||STATE.fechaAten)}
-      ${Field("Tipo","f_tipo","text",f.tipo||"",TIPOS_ATENCION)}
-    </div>
-    <div class="grid2">
-      ${Field("Profesional","f_profesional","text",f.profesional||"",PROFS)}
-      ${Field("Minutos","f_duracion","number",f.duracion||30)}
-    </div>
-    ${Field("Descripción *","f_descripcion","textarea",f.descripcion||"")}
-    ${Field("Acciones siguientes","f_accionesSiguientes","textarea",f.accionesSiguientes||"")}
-    <div style="display:flex;gap:10px">
-      <button onclick="closeSheet()" class="btn btn-ghost tap" style="flex:1;justify-content:center">Cancelar</button>
-      <button onclick="guardarAtencion()" class="btn btn-primary tap" style="flex:2;justify-content:center">Guardar</button>
-    </div>`);
-}
-
-// ═══════════════════════════════════════════════════════
-// SEGUIMIENTO
-// ═══════════════════════════════════════════════════════
-function buildSeguimiento(){
-  if(STATE.detail && STATE.tab==="seguimiento") return buildSeguimientoDetalle();
-  return `
-    <div style="font-size:13px;color:#6B7280;font-weight:600;margin-bottom:10px">${STATE.intervenciones.length} intervenciones</div>
-    <div style="display:flex;flex-direction:column;gap:8px">
-      ${STATE.intervenciones.length===0?SCard('<p style="color:#9CA3AF;text-align:center;font-size:13px">Sin intervenciones registradas</p>'):""}
-      ${STATE.intervenciones.map(i=>{
-        const u = STATE.usuarios.find(u=>u.id===i.usuarioId);
-        const nA = STATE.atenciones.filter(a=>a.intervencionId===i.id).length;
-        const lastA = [...STATE.atenciones].filter(a=>a.intervencionId===i.id).sort((a,b)=>b.fecha.localeCompare(a.fecha))[0];
-        return SCard(`
-          <div style="display:flex;gap:12px;align-items:flex-start">
-            <div style="width:4px;border-radius:4px;align-self:stretch;background:${catColor(i.categoria)};flex-shrink:0;min-height:50px"></div>
-            <div style="flex:1;min-width:0">
-              <div style="font-weight:800;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:5px">${esc(i.titulo)}</div>
-              <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:5px">
-                ${CatChip(i.categoria)}
-                ${i.subCategoria?Badge(i.subCategoria,"#F3F4F6","#6B7280"):""}
-              </div>
-              <div style="font-size:12px;color:#6B7280;display:flex;gap:12px;flex-wrap:wrap">
-                <span>👤 ${esc(u?.nombre||"—")}</span>
-                <span>📋 ${nA} aten.</span>
-                ${lastA?`<span>Última: ${fmtDate(lastA.fecha)}</span>`:""}
-              </div>
-            </div>
-            <span style="color:#9CA3AF;font-size:20px;align-self:center">›</span>
-          </div>`, "", `openDetalle('seguimiento','${i.id}')`);
-      }).join("")}
-    </div>`;
-}
-
-function buildSeguimientoDetalle(){
-  const i = STATE.intervenciones.find(x=>x.id==STATE.detail);
-  if(!i) return "";
-  const u = STATE.usuarios.find(u=>u.id===i.usuarioId);
-  const ates = STATE.atenciones.filter(a=>a.intervencionId===i.id).sort((a,b)=>b.fecha.localeCompare(a.fecha));
-  return `<div style="position:fixed;inset:0;z-index:150;background:#F4F6FA;display:flex;flex-direction:column">
-    <div style="background:#fff;border-bottom:1px solid #E4E8F0;padding:14px 16px;display:flex;align-items:center;gap:12px;flex-shrink:0">
-      <button onclick="setState({detail:null})" class="tap" style="background:#F4F6FA;border:none;width:36px;height:36px;border-radius:50%;font-size:22px;color:#111827;cursor:pointer">‹</button>
-      <h2 style="font-size:15px;font-weight:800;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(i.titulo)}</h2>
-    </div>
-    <div style="padding:16px;flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:14px">
-      ${SCard(`
-        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
-          ${CatChip(i.categoria)}
-          ${i.subCategoria?Badge(i.subCategoria,"#F3F4F6","#6B7280"):""}
-        </div>
-        ${[["Usuario",u?.nombre||"—"],["Profesional",i.profesional||"—"],["Fecha",fmtDate(i.fechaInicio)]].map(([k,v])=>`
-          <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #E4E8F0">
-            <span style="font-size:12px;color:#6B7280;font-weight:600">${k}</span>
-            <span style="font-size:13px;font-weight:700">${esc(v)}</span>
-          </div>`).join("")}
-        ${i.descripcion?`<p style="margin-top:12px;font-size:13px;line-height:1.6">${esc(i.descripcion)}</p>`:""}
-      `)}
-      <div>
-        <div style="font-weight:800;font-size:12px;color:#6B7280;margin-bottom:10px">HISTORIAL (${ates.length})</div>
-        ${ates.map((a,idx)=>`
-          <div style="display:flex;gap:10px;margin-bottom:10px">
-            <div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0">
-              <div style="width:10px;height:10px;border-radius:50%;background:#2563EB;margin-top:5px"></div>
-              ${idx<ates.length-1?`<div style="width:2px;flex:1;background:#E4E8F0;margin-top:2px"></div>`:""}
-            </div>
-            ${SCard(`
-              <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px">
-                ${Badge(fmtDate(a.fecha),"#EFF4FF","#2563EB")}
-                ${Badge(a.tipo,"#F3F4F6","#6B7280")}
-                ${Badge(a.duracion+"min","#F3F4F6","#6B7280")}
-              </div>
-              <p style="font-size:13px;line-height:1.5">${esc(a.descripcion)}</p>
-              ${a.accionesSiguientes?`<div style="margin-top:8px;background:#FFFBEB;border-radius:8px;padding:7px 10px;font-size:12px;color:#D97706;font-weight:700">→ ${esc(a.accionesSiguientes)}</div>`:""}
-            `,"flex:1;margin-bottom:0")}
-          </div>`).join("")}
-        ${ates.length===0?`<p style="color:#9CA3AF;font-size:13px">Sin atenciones registradas</p>`:""}
-      </div>
-    </div>
-  </div>`;
-}
-
-// ═══════════════════════════════════════════════════════
-// INSTITUCIONAL
 // ═══════════════════════════════════════════════════════
 function buildInstitucional(){
   if(STATE.actaReunion) return buildActaView();
@@ -1216,8 +1062,6 @@ function buildApp(){
     case "inicio":         content = buildInicio(); break;
     case "usuarios":       content = buildUsuarios(); break;
     case "intervenciones": content = buildIntervenciones(); break;
-    case "atenciones":     content = buildAtenciones(); break;
-    case "seguimiento":    content = buildSeguimiento(); break;
     case "institucional":  content = buildInstitucional(); break;
     case "legajo":         content = buildLegajo(); break;
     case "mapa":           content = buildMapa(); break;
