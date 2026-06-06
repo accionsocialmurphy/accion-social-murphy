@@ -89,13 +89,13 @@ textarea{resize:vertical}
 // ═══════════════════════════════════════════════════════
 // DATOS Y CONSTANTES
 // ═══════════════════════════════════════════════════════
-const CATS = ["Vivienda","Económica","Laboral","Familiar","Salud","Educación","Trámites","Consumo problemático","Equipo de Niñez","Consultorio de Escucha Niñez","Talleres Centro de Día","Derivación a Equipo de Género","Otros"];
+const CATS = ["Vivienda","Económica","Laboral","Familiar","Salud","Educación","Trámites","Consumo problemático","Equipo de Niñez","Consultorio de Escucha Niñez","Talleres Centro de Día","Derivación a Equipo de Género","Traslados","Salud Mental","Pago de Servicios","Otros"];
 const SUBCATS = {"Salud":["Análisis","Ecografía","Medicación","Ayuda Excepcional"]};
 const TIPOS_ATENCION = ["Presencial","Telefónica","Domiciliaria","Telemática"];
 const PROFS = ["Biolatto Eliana","Compagnucci Natalia","Gateu Sofía","Quinteros Anabella","Rubio María Celeste"];
 const TIPOS_REUNION = ["Reunión de equipo","Reunión interinstitucional","Capacitación","Supervisión","Otra"];
 const TIPOS_EVENTO = [{label:"Reunión",color:"#2563EB",icon:"🤝"},{label:"Visita",color:"#059669",icon:"🏠"},{label:"Trámite",color:"#D97706",icon:"📄"},{label:"Capacitación",color:"#7C3AED",icon:"📚"},{label:"Recordatorio",color:"#DC2626",icon:"🔔"},{label:"Otro",color:"#6B7280",icon:"📌"}];
-const CAT_COLORS = {"Vivienda":"#2563EB","Económica":"#059669","Laboral":"#D97706","Familiar":"#7C3AED","Salud":"#DC2626","Educación":"#0891B2","Trámites":"#475569","Consumo problemático":"#B45309","Equipo de Niñez":"#0D9488","Consultorio de Escucha Niñez":"#0E7490","Talleres Centro de Día":"#6D28D9","Derivación a Equipo de Género":"#DB2777","Otros":"#6B7280"};
+const CAT_COLORS = {"Vivienda":"#2563EB","Económica":"#059669","Laboral":"#D97706","Familiar":"#7C3AED","Salud":"#DC2626","Educación":"#0891B2","Trámites":"#475569","Consumo problemático":"#B45309","Equipo de Niñez":"#0D9488","Consultorio de Escucha Niñez":"#0E7490","Talleres Centro de Día":"#6D28D9","Derivación a Equipo de Género":"#DB2777","Traslados":"#0369A1","Salud Mental":"#7C3AED","Pago de Servicios":"#059669","Otros":"#6B7280"};
 const CIUDAD = "Murphy, Santa Fe, CP 2601";
 const MESES = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
 const DIAS_CORTO = ["Dom","Lun","Mar","Mié","Jue","Vie","Sáb"];
@@ -105,6 +105,7 @@ const DIAS_CORTO = ["Dom","Lun","Mar","Mié","Jue","Vie","Sáb"];
 // ═══════════════════════════════════════════════════════
 const STATE = {
   tab: "inicio",
+  searchInt: "",
   usuarios: [],
   intervenciones: [],
   atenciones: [],
@@ -475,10 +476,15 @@ function buildIntervenciones(){
   if(STATE.detail && STATE.tab==="intervenciones") return buildIntervencionDetalle();
   const filtered = STATE.intervenciones.filter(i=>!STATE.filtCat||i.categoria===STATE.filtCat);
   return `
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
-      <div style="font-size:13px;color:#6B7280;font-weight:600">${filtered.length} intervenciones</div>
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px">
+      <div style="flex:1;position:relative">
+        <span style="position:absolute;left:11px;top:50%;transform:translateY(-50%);font-size:14px;color:#9CA3AF">🔎</span>
+        <input value="${esc(STATE.searchInt||'')" oninput="setState({searchInt:this.value})" placeholder="Buscar por nombre o intervención…"
+          style="width:100%;background:#fff;border:1.5px solid ${STATE.searchInt?'#2563EB':'#E4E8F0'};border-radius:10px;padding:9px 12px 9px 34px;font-size:14px;color:#111827;font-family:Nunito,sans-serif">
+      </div>
       <button onclick="openSheet('intervencionNueva')" class="btn btn-primary tap">+ Nueva</button>
     </div>
+    <div style="font-size:12px;color:#6B7280;font-weight:600;margin-bottom:10px">${filtered.length} intervenciones</div>
     <div class="hscroll" style="margin-bottom:14px">
       <button onclick="setState({filtCat:''})" class="pill ${!STATE.filtCat?'active':'inactive'} tap">Todas</button>
       ${CATS.map(c=>`<button onclick="setState({filtCat:STATE.filtCat==='${c}'?'':'${c}'})" class="pill ${STATE.filtCat===c?'active':'inactive'} tap" style="${STATE.filtCat===c?`background:${catColor(c)}`:''};">${c}</button>`).join("")}
@@ -623,7 +629,8 @@ function buildAtenciones(){
       ${SCard(`<div style="text-align:center"><div style="font-size:28px;font-weight:800;color:#2563EB">${porFecha.length}</div><div style="font-size:11px;color:#6B7280;font-weight:600">Atenciones</div></div>`,"padding:12px")}
       ${SCard(`<div style="text-align:center"><div style="font-size:28px;font-weight:800;color:#059669">${totalMin}</div><div style="font-size:11px;color:#6B7280;font-weight:600">Minutos</div></div>`,"padding:12px")}
     </div>
-    <button onclick="openSheet('atencionNueva')" class="btn btn-primary btn-full tap" style="margin-bottom:14px">+ Registrar atención</button>
+    <button onclick="openSheet('atencionNueva')" class="btn btn-primary btn-full tap" style="margin-bottom:8px">+ Registrar atención</button>
+    ${porFecha.length>0?`<button onclick="imprimirAtencionesDia()" class="btn btn-full tap" style="margin-bottom:14px;background:#1e3a5f;color:#fff;border:none">🖨 Imprimir atenciones del día (${porFecha.length})</button>`:`<div style="margin-bottom:14px"></div>`}
     <div style="display:flex;flex-direction:column;gap:8px">
       ${porFecha.length===0?SCard('<p style="color:#9CA3AF;text-align:center;font-size:13px;padding:8px 0">Sin atenciones este día</p>'):""}
       ${porFecha.map(a=>{
@@ -1260,12 +1267,10 @@ function guardarUsuario(){
   const f = {...STATE.form,...v};
   if(f.id){
     STATE.usuarios = STATE.usuarios.map(u=>u.id==f.id?f:u);
-    syncSheet("usuarios","update",f);
     setState({usuarios:STATE.usuarios,sheet:null,detail:f.id});
   } else {
     f.id = newId(STATE.usuarios);
     STATE.usuarios = [...STATE.usuarios,f];
-    syncSheet("usuarios","insert",f);
     setState({usuarios:STATE.usuarios,sheet:null});
   }
 }
@@ -1283,19 +1288,16 @@ function guardarIntervencion(){
   delete f._busqModo; delete f._busqQ;
   if(f.id){
     STATE.intervenciones = STATE.intervenciones.map(i=>i.id==f.id?f:i);
-    syncSheet("intervenciones","update",f);
     setState({intervenciones:STATE.intervenciones,sheet:null,detail:f.id});
   } else {
     f.id = newId(STATE.intervenciones);
     STATE.intervenciones = [...STATE.intervenciones,f];
-    syncSheet("intervenciones","insert",f);
     setState({intervenciones:STATE.intervenciones,sheet:null});
   }
 }
 
 function eliminarIntervencion(id){
   if(!confirm("¿Eliminar intervención?")) return;
-  syncSheet("intervenciones","delete",null,id);
   setState({intervenciones:STATE.intervenciones.filter(i=>i.id!=id),detail:null});
 }
 
@@ -1308,19 +1310,16 @@ function guardarAtencion(){
   const f = {...STATE.form,...v,intervencionId:intObj?intObj.id:0,usuarioId:intObj?intObj.usuarioId:0,duracion:Number(v.duracion)||0};
   if(f.id){
     STATE.atenciones = STATE.atenciones.map(a=>a.id==f.id?f:a);
-    syncSheet("atenciones","update",f);
     setState({atenciones:STATE.atenciones,sheet:null});
   } else {
     f.id = newId(STATE.atenciones);
     STATE.atenciones = [...STATE.atenciones,f];
-    syncSheet("atenciones","insert",f);
     setState({atenciones:STATE.atenciones,sheet:null});
   }
 }
 
 function eliminarAtencion(id){
   if(!confirm("¿Eliminar atención?")) return;
-  syncSheet("atenciones","delete",null,id);
   setState({atenciones:STATE.atenciones.filter(a=>a.id!=id)});
 }
 
@@ -1330,19 +1329,16 @@ function guardarReunion(){
   const f = {...STATE.form,...v};
   if(f.id){
     STATE.reuniones = STATE.reuniones.map(r=>r.id==f.id?f:r);
-    syncSheet("reuniones","update",f);
     setState({reuniones:STATE.reuniones,sheet:null,detail:f.id});
   } else {
     f.id = newId(STATE.reuniones);
     STATE.reuniones = [...STATE.reuniones,f];
-    syncSheet("reuniones","insert",f);
     setState({reuniones:STATE.reuniones,sheet:null});
   }
 }
 
 function eliminarReunion(id){
   if(!confirm("¿Eliminar reunión?")) return;
-  syncSheet("reuniones","delete",null,id);
   setState({reuniones:STATE.reuniones.filter(r=>r.id!=id),detail:null});
 }
 
@@ -1378,19 +1374,16 @@ function guardarEvento(){
   const f = {...STATE.form,...v};
   if(f.id){
     STATE.eventos = STATE.eventos.map(e=>e.id==f.id?f:e);
-    syncSheet("eventos","update",f);
     setState({eventos:STATE.eventos,sheet:null});
   } else {
     f.id = newId(STATE.eventos);
     STATE.eventos = [...STATE.eventos,f];
-    syncSheet("eventos","insert",f);
     setState({eventos:STATE.eventos,sheet:null});
   }
 }
 
 function eliminarEvento(id){
   if(!confirm("¿Eliminar evento?")) return;
-  syncSheet("eventos","delete",null,id);
   setState({eventos:STATE.eventos.filter(e=>e.id!=id)});
 }
 
@@ -1531,6 +1524,292 @@ function imprimirLegajo(uid){
   const w=window.open("","_blank"); w.document.write(html); w.document.close();
 }
 
+
+// ═══════════════════════════════════════════════════════
+// GOOGLE SHEETS SYNC
+// ═══════════════════════════════════════════════════════
+const SHEETS_URL = "https://script.google.com/macros/s/AKfycbzCiOJMZCjkF1o77ArzCLPiZX-0o50uwWjJGjMVdy-H9Pps766mOkrYgti_7hbwl1UC/exec";
+
+async function cargarDatos(){
+  showLoading(true);
+  try{
+    const tabs=["usuarios","intervenciones","atenciones","reuniones","eventos","informes"];
+    const results=await Promise.all(tabs.map(tab=>fetch(SHEETS_URL+"?tab="+tab).then(r=>r.json()).catch(()=>[])));
+    STATE.usuarios      =results[0].map(normalizar)||[];
+    STATE.intervenciones=results[1].map(normalizar)||[];
+    STATE.atenciones    =results[2].map(normalizar)||[];
+    STATE.reuniones     =results[3].map(r=>({...normalizar(r),participantes:parseLista(r.participantes),situaciones:parseLista(r.situaciones)})) ||[];
+    STATE.eventos       =results[4].map(normalizar)||[];
+    STATE.informes      =results[5].map(normalizar)||[];
+    showLoading(false);
+    render();
+  }catch(e){showLoading(false);console.error("Error:",e);render();}
+}
+
+function normalizar(obj){
+  const r={};
+  for(const k in obj){
+    const v=obj[k];
+    if(k==="id"||k==="usuarioId"||k==="intervencionId"||k==="duracion") r[k]=Number(v)||0;
+    else r[k]=v===undefined||v===null?"":String(v);
+  }
+  return r;
+}
+
+function parseLista(val){
+  if(!val||val==="") return [];
+  try{return JSON.parse(val);}catch{return [];}
+}
+
+async function syncSheet(tab,action,data,id){
+  try{
+    const d=data?{...data}:null;
+    if(d&&d.participantes) d.participantes=JSON.stringify(d.participantes||[]);
+    if(d&&d.situaciones)   d.situaciones=JSON.stringify(d.situaciones||[]);
+    if(d&&d.convivientes&&typeof d.convivientes!=="string") d.convivientes=JSON.stringify(d.convivientes||[]);
+    await fetch(SHEETS_URL,{method:"POST",body:JSON.stringify({tab,action,data:d,id})});
+  }catch(e){console.error("Sync error:",e);}
+}
+
+function showLoading(show){
+  const el=document.getElementById("loading-overlay");
+  if(el) el.style.display=show?"flex":"none";
+}
+
+
+// ═══════════════════════════════════════════════════════
+// INFORMES SOCIOAMBIENTALES  
+// ═══════════════════════════════════════════════════════
+function buildInformes(){
+  if(STATE.detail && STATE.tab==="informe") return buildInformeDetalle();
+  const informes=STATE.informes||[];
+  return `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <div style="font-size:13px;color:#6B7280;font-weight:600">${informes.length} informe${informes.length!==1?"s":""}</div>
+      <button onclick="openSheet('informeNuevo')" class="btn tap" style="background:#0369A1;color:#fff;border:none">+ Nuevo informe</button>
+    </div>
+    ${informes.length===0?SCard(`<div style="text-align:center;padding:24px 0;color:#9CA3AF"><div style="font-size:40px;margin-bottom:10px">📝</div><div style="font-size:13px;font-weight:700;color:#6B7280">Sin informes registrados</div><div style="font-size:12px;margin-top:4px">Tocá "+ Nuevo informe" para comenzar</div></div>`):""}
+    <div style="display:flex;flex-direction:column;gap:8px">
+      ${[...informes].sort((a,b)=>(b.fecha||"").localeCompare(a.fecha||"")).map(inf=>{
+        const u=STATE.usuarios.find(u=>u.id==inf.usuarioId);
+        return SCard(`<div style="display:flex;gap:12px;align-items:flex-start">
+          <div style="width:44px;height:44px;border-radius:12px;background:#EFF4FF;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">📝</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-weight:800;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:3px">${esc(u?.nombre||inf.nombre||"Sin nombre")}</div>
+            <div style="font-size:12px;color:#6B7280;display:flex;gap:10px;flex-wrap:wrap">
+              ${inf.dni?`<span>🪪 ${esc(inf.dni)}</span>`:""}
+              ${inf.fecha?`<span>📅 ${fmtDate(inf.fecha)}</span>`:""}
+              ${inf.profesional?`<span>🧑 ${esc(inf.profesional)}</span>`:""}
+            </div>
+          </div>
+          <span style="color:#9CA3AF;font-size:20px;align-self:center">›</span>
+        </div>`,"border-left:4px solid #0369A1",`openDetalle('informe','${inf.id}')`);
+      }).join("")}
+    </div>
+    ${STATE.sheet?buildSheetInforme():""}`;
+}
+
+function buildInformeDetalle(){
+  const inf=(STATE.informes||[]).find(x=>x.id==STATE.detail);
+  if(!inf) return "";
+  const conv=typeof inf.convivientes==="string"?JSON.parse(inf.convivientes||"[]"):(inf.convivientes||[]);
+  return `<div style="position:fixed;inset:0;z-index:150;background:#F4F6FA;display:flex;flex-direction:column">
+    <div style="background:#0369A1;padding:14px 16px;display:flex;align-items:center;gap:12px;flex-shrink:0">
+      <button onclick="setState({detail:null})" class="tap" style="background:rgba(255,255,255,.2);border:none;width:36px;height:36px;border-radius:50%;font-size:22px;color:#fff;cursor:pointer">‹</button>
+      <h2 style="font-size:15px;font-weight:800;flex:1;color:#fff">Informe Socioambiental</h2>
+    </div>
+    <div style="padding:16px;flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:12px">
+      ${SCard(`<div style="font-size:11px;font-weight:800;color:#0369A1;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">👤 Datos del solicitante</div>
+        ${[["Nombre",inf.nombre],["DNI",inf.dni],["Domicilio",inf.domicilio],["F. Nacimiento",inf.fechaNac?fmtDate(inf.fechaNac):""],["Obra Social",inf.obraSocial],["Ocupación",inf.ocupacion],["Educación",inf.educacion],["Título",inf.titulo],["Trabajo",inf.trabajo],["Remuneración",inf.remuneracion]].filter(([k,v])=>v).map(([k,v])=>`<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #E4E8F0"><span style="font-size:12px;color:#6B7280;font-weight:600">${k}</span><span style="font-size:13px;font-weight:700;text-align:right;max-width:60%">${esc(v)}</span></div>`).join("")}`)}
+      ${conv.length>0?SCard(`<div style="font-size:11px;font-weight:800;color:#0369A1;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">👨‍👩‍👧 Grupo familiar (${conv.length})</div>${conv.map(c=>`<div style="background:#F4F6FA;border-radius:8px;padding:10px;margin-bottom:6px"><div style="font-weight:700;font-size:13px">${esc(c.nombre||"—")}</div><div style="font-size:12px;color:#6B7280;margin-top:3px;display:flex;gap:10px;flex-wrap:wrap">${c.dni?`<span>DNI: ${esc(c.dni)}</span>`:""}${c.fechaNac?`<span>Nac: ${fmtDate(c.fechaNac)}</span>`:""}${c.ocupacion?`<span>${esc(c.ocupacion)}</span>`:""}${c.ingresos?`<span>$${esc(c.ingresos)}</span>`:""}</div></div>`).join("")}`):""}
+      ${SCard(`<div style="font-size:11px;font-weight:800;color:#0369A1;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">🏥 Salud</div>${[["CUD",inf.saludCud],["Enf. crónica",inf.saludCronica],["Detalle crónica",inf.saludCronicaDetalle],["Medicación",inf.saludMedicacion],["Detalle medicación",inf.saludMedicacionDetalle],["Controles en",inf.saludControles]].filter(([k,v])=>v).map(([k,v])=>`<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #E4E8F0"><span style="font-size:12px;color:#6B7280;font-weight:600">${k}</span><span style="font-size:13px;font-weight:700;text-align:right;max-width:60%">${esc(v)}</span></div>`).join("")}`)}
+      ${SCard(`<div style="font-size:11px;font-weight:800;color:#0369A1;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">🏠 Vivienda</div>${[["Tipo",inf.vivTipo],["Habitaciones",inf.vivHabitaciones],["Baño interior",inf.vivBanio],["Habitabilidad",inf.vivEstado],["Gas",inf.vivGas],["Electricidad",inf.vivElectricidad],["Internet",inf.vivInternet],["Agua potable",inf.vivAgua],["Calefacción",inf.vivCalefaccion],["Mobiliario",inf.vivMobiliario],["Adecuada",inf.vivAdecuada]].filter(([k,v])=>v).map(([k,v])=>`<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #E4E8F0"><span style="font-size:12px;color:#6B7280;font-weight:600">${k}</span><span style="font-size:13px;font-weight:700;text-align:right;max-width:60%">${esc(v)}</span></div>`).join("")}${inf.consideraciones?`<div style="margin-top:10px;background:#F4F6FA;border-radius:8px;padding:10px"><p style="font-size:13px;line-height:1.5">${esc(inf.consideraciones)}</p></div>`:""}`)}
+      <button onclick="imprimirInforme(${inf.id})" class="btn btn-full tap" style="background:#0369A1;color:#fff;border:none;font-size:14px">📄 Imprimir informe</button>
+      <div style="display:flex;gap:10px">
+        <button onclick="openSheet('informeEdit','${inf.id}')" class="btn btn-primary tap" style="flex:1;justify-content:center">✏️ Editar</button>
+        <button onclick="eliminarInforme('${inf.id}')" class="btn btn-danger tap">🗑</button>
+      </div>
+    </div>
+    ${STATE.sheet?buildSheetInforme():""}
+  </div>`;
+}
+
+function buildSheetInforme(){
+  const f=STATE.form;
+  const conv=typeof f.convivientes==="string"?JSON.parse(f.convivientes||"[]"):(f.convivientes||[]);
+  const siNo=["Sí","No","No sabe"];
+  const eduOpts=["Primaria incompleta","Primaria completa","Secundario incompleto","Secundario completo","Terciario/Universitario incompleto","Terciario/Universitario completo"];
+  const selU=STATE.usuarios.find(u=>u.id===Number(f.usuarioId));
+  return Sheet("Informe Socioambiental",`
+    <div style="background:#EFF4FF;border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:#0369A1;font-weight:600">📝 Informe Socioambiental · Área de Desarrollo Social · Murphy, Santa Fe</div>
+    <div style="font-size:12px;font-weight:800;color:#0369A1;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">👤 Datos del solicitante</div>
+    <div class="field"><label>Vincular con usuario registrado (opcional)</label>
+      ${selU?`<div style="display:flex;align-items:center;gap:10px;background:#EFF4FF;border:1.5px solid #2563EB;border-radius:10px;padding:9px 14px;margin-bottom:6px"><div style="flex:1"><div style="font-weight:800;font-size:14px">${esc(selU.nombre)}</div><div style="font-size:11px;color:#2563EB">DNI: ${esc(selU.dni||"—")}</div></div><button onclick="setState({form:{...STATE.form,usuarioId:''}})" style="background:none;border:none;color:#6B7280;font-size:18px;cursor:pointer">×</button></div>`:`<select onchange="setState({form:{...STATE.form,usuarioId:this.value}})" style="background:#F9FAFB;border:1.5px solid #E4E8F0;border-radius:10px;color:#111827;padding:10px 12px;font-size:14px;width:100%;font-family:Nunito,sans-serif;margin-bottom:6px"><option value="">Sin vinculación / cargar manualmente</option>${STATE.usuarios.map(u=>`<option value="${u.id}" ${f.usuarioId==u.id?"selected":""}>${esc(u.nombre)} — DNI: ${esc(u.dni||"—")}</option>`).join("")}</select>`}
+    </div>
+    ${Field("Nombre y apellido *","f_nombre","text",f.nombre||selU?.nombre||"","",true)}
+    <div class="grid2">${Field("DNI","f_dni","text",f.dni||selU?.dni||"")}${Field("Fecha de nacimiento","f_fechaNac","date",f.fechaNac||selU?.fechaNac||"")}</div>
+    ${Field("Domicilio actual","f_domicilio","text",f.domicilio||selU?.direccion||"")}
+    <div class="grid2">${Field("Obra social","f_obraSocial","text",f.obraSocial||"")}${Field("Ocupación","f_ocupacion","text",f.ocupacion||"")}</div>
+    ${Field("Nivel educativo","f_educacion","text",f.educacion||"",eduOpts)}
+    ${(f.educacion||"").includes("completo")&&(f.educacion||"").includes("Terciario")?Field("Título obtenido","f_titulo","text",f.titulo||""):""}
+    ${Field("Trabajo actual","f_trabajo","text",f.trabajo||"")}
+    ${Field("Remuneración aproximada","f_remuneracion","text",f.remuneracion||"")}
+    ${Field("Profesional responsable","f_profesional","text",f.profesional||"",["Biolatto Eliana","Compagnucci Natalia","Gateu Sofía","Quinteros Anabella","Rubio María Celeste"])}
+    ${Field("Fecha del informe","f_fecha","date",f.fecha||hoy())}
+    <div style="height:1px;background:#E4E8F0;margin:16px 0"></div>
+    <div style="font-size:12px;font-weight:800;color:#0369A1;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">👨‍👩‍👧 Grupo familiar conviviente</div>
+    ${conv.map((c,i)=>`<div style="background:#F4F6FA;border-radius:8px;padding:10px 12px;margin-bottom:8px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><span style="font-weight:700;font-size:13px">${esc(c.nombre||"Conviviente "+(i+1))}</span><button onclick="removeConviviente(${i})" style="background:none;border:none;color:#DC2626;font-size:16px;cursor:pointer">×</button></div><div style="font-size:12px;color:#6B7280;display:flex;gap:10px;flex-wrap:wrap">${c.dni?`<span>DNI: ${esc(c.dni)}</span>`:""}${c.fechaNac?`<span>Nac: ${fmtDate(c.fechaNac)}</span>`:""}${c.ocupacion?`<span>${esc(c.ocupacion)}</span>`:""}${c.ingresos?`<span>$${esc(c.ingresos)}</span>`:""}</div></div>`).join("")}
+    <div style="background:#F4F6FA;border-radius:10px;padding:12px;border:1.5px solid #E4E8F0;margin-bottom:12px">
+      <div style="font-size:12px;font-weight:700;color:#6B7280;margin-bottom:8px">+ Agregar conviviente</div>
+      <div class="grid2">
+        <div class="field"><label>Nombre completo</label><input id="conv_nombre" placeholder="Nombre" style="background:#fff;border:1.5px solid #E4E8F0;border-radius:10px;color:#111827;padding:9px 12px;font-size:14px;width:100%;font-family:Nunito,sans-serif"></div>
+        <div class="field"><label>DNI</label><input id="conv_dni" placeholder="DNI" style="background:#fff;border:1.5px solid #E4E8F0;border-radius:10px;color:#111827;padding:9px 12px;font-size:14px;width:100%;font-family:Nunito,sans-serif"></div>
+      </div>
+      <div class="grid2">
+        <div class="field"><label>Fecha de nacimiento</label><input id="conv_fechaNac" type="date" style="background:#fff;border:1.5px solid #E4E8F0;border-radius:10px;color:#111827;padding:9px 12px;font-size:14px;width:100%;font-family:Nunito,sans-serif"></div>
+        <div class="field"><label>Ocupación</label><input id="conv_ocupacion" placeholder="Ocupación" style="background:#fff;border:1.5px solid #E4E8F0;border-radius:10px;color:#111827;padding:9px 12px;font-size:14px;width:100%;font-family:Nunito,sans-serif"></div>
+      </div>
+      <div class="field"><label>Ingresos aproximados</label><input id="conv_ingresos" placeholder="$" style="background:#fff;border:1.5px solid #E4E8F0;border-radius:10px;color:#111827;padding:9px 12px;font-size:14px;width:100%;font-family:Nunito,sans-serif"></div>
+      <button onclick="addConviviente()" class="btn btn-full tap" style="background:#0369A1;color:#fff;border:none;margin-top:4px">+ Agregar conviviente</button>
+    </div>
+    <div style="height:1px;background:#E4E8F0;margin:16px 0"></div>
+    <div style="font-size:12px;font-weight:800;color:#0369A1;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">🏥 Situación de salud</div>
+    ${Field("¿Alguien posee CUD?","f_saludCud","text",f.saludCud||"",siNo)}
+    ${Field("¿Alguien tiene enfermedad crónica?","f_saludCronica","text",f.saludCronica||"",siNo)}
+    ${f.saludCronica==="Sí"?Field("Especificar enfermedad/es","f_saludCronicaDetalle","textarea",f.saludCronicaDetalle||""):""}
+    ${Field("¿Alguien utiliza medicación?","f_saludMedicacion","text",f.saludMedicacion||"",siNo)}
+    ${f.saludMedicacion==="Sí"?Field("Especificar medicación","f_saludMedicacionDetalle","textarea",f.saludMedicacionDetalle||""):""}
+    ${Field("¿Dónde realizan controles de salud?","f_saludControles","text",f.saludControles||"")}
+    <div style="height:1px;background:#E4E8F0;margin:16px 0"></div>
+    <div style="font-size:12px;font-weight:800;color:#0369A1;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">🏠 Datos de la vivienda</div>
+    <div class="grid2">${Field("Tipo de vivienda","f_vivTipo","text",f.vivTipo||"",["Casa","Departamento","Rancho/Precaria","Habitación","Otro"])}${Field("N° de habitaciones","f_vivHabitaciones","text",f.vivHabitaciones||"",["1","2","3","4","5 o más"])}</div>
+    ${Field("¿Baño instalado adentro?","f_vivBanio","text",f.vivBanio||"",siNo)}
+    ${Field("¿Buenas condiciones de habitabilidad?","f_vivEstado","text",f.vivEstado||"",["Buenas","Regular","Malas","Muy malas"])}
+    <div class="grid2">${Field("Gas","f_vivGas","text",f.vivGas||"",["Gas natural","Gas envasado","Leña","Sin gas","Otro"])}${Field("Electricidad","f_vivElectricidad","text",f.vivElectricidad||"",siNo)}</div>
+    <div class="grid2">${Field("Internet","f_vivInternet","text",f.vivInternet||"",siNo)}${Field("Agua potable","f_vivAgua","text",f.vivAgua||"",siNo)}</div>
+    ${Field("¿Con qué se calefaccionan?","f_vivCalefaccion","text",f.vivCalefaccion||"",["Gas natural","Estufa a leña","Calefactor a gas","Eléctrica","Sin calefacción"])}
+    ${Field("¿El mobiliario es adecuado?","f_vivMobiliario","text",f.vivMobiliario||"",["Sí, adecuado","Parcialmente adecuado","No adecuado"])}
+    ${Field("¿La vivienda es adecuada para el grupo familiar?","f_vivAdecuada","text",f.vivAdecuada||"",["Sí","Parcialmente","No"])}
+    ${Field("Consideraciones adicionales","f_consideraciones","textarea",f.consideraciones||"")}
+    <div style="display:flex;gap:10px;padding-top:8px">
+      <button onclick="closeSheet()" class="btn btn-ghost tap" style="flex:1;justify-content:center">Cancelar</button>
+      <button onclick="guardarInforme()" class="btn tap" style="flex:2;justify-content:center;background:#0369A1;color:#fff;border:none;font-weight:700">Guardar informe</button>
+    </div>`);
+}
+
+function addConviviente(){
+  const nombre=(document.getElementById("conv_nombre")||{}).value||"";
+  const dni=(document.getElementById("conv_dni")||{}).value||"";
+  const fechaNac=(document.getElementById("conv_fechaNac")||{}).value||"";
+  const ocupacion=(document.getElementById("conv_ocupacion")||{}).value||"";
+  const ingresos=(document.getElementById("conv_ingresos")||{}).value||"";
+  if(!nombre.trim()) return alert("Ingresá al menos el nombre del conviviente");
+  const conv=typeof STATE.form.convivientes==="string"?JSON.parse(STATE.form.convivientes||"[]"):(STATE.form.convivientes||[]);
+  conv.push({nombre,dni,fechaNac,ocupacion,ingresos});
+  setState({form:{...STATE.form,convivientes:conv}});
+}
+
+function removeConviviente(idx){
+  const conv=typeof STATE.form.convivientes==="string"?JSON.parse(STATE.form.convivientes||"[]"):(STATE.form.convivientes||[]);
+  conv.splice(idx,1);
+  setState({form:{...STATE.form,convivientes:conv}});
+}
+
+function guardarInforme(){
+  const v=getFormValues();
+  if(!v.nombre?.trim()) return alert("El nombre es obligatorio");
+  const f={...STATE.form,...v};
+  if(typeof f.convivientes!=="string") f.convivientes=JSON.stringify(f.convivientes||[]);
+  if(f.id){
+    STATE.informes=(STATE.informes||[]).map(i=>i.id==f.id?f:i);
+    syncSheet("informes","update",f);
+    setState({informes:STATE.informes,sheet:null,detail:f.id});
+  } else {
+    f.id=newId(STATE.informes||[]);
+    STATE.informes=[...(STATE.informes||[]),f];
+    syncSheet("informes","insert",f);
+    setState({informes:STATE.informes,sheet:null});
+  }
+}
+
+function eliminarInforme(id){
+  if(!confirm("¿Eliminar informe?")) return;
+  syncSheet("informes","delete",null,id);
+  setState({informes:(STATE.informes||[]).filter(i=>i.id!=id),detail:null});
+}
+
+function imprimirInforme(id){
+  const inf=(STATE.informes||[]).find(x=>x.id==id);
+  if(!inf) return;
+  const conv=typeof inf.convivientes==="string"?JSON.parse(inf.convivientes||"[]"):(inf.convivientes||[]);
+  let doc=`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>Informe — ${inf.nombre}</title>
+  <style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:Arial,sans-serif;font-size:12px;color:#111;padding:28px 36px;max-width:800px;margin:0 auto}
+  .enc{border-bottom:3px solid #0369A1;padding-bottom:14px;margin-bottom:18px;display:flex;justify-content:space-between}
+  .enc h1{font-size:20px;font-weight:700;color:#0369A1}.enc .sub{font-size:12px;color:#6B7280;margin-top:2px}
+  .enc .meta{text-align:right;font-size:12px}
+  .sec{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:#0369A1;background:#EFF4FF;padding:5px 10px;border-radius:6px;margin:16px 0 10px}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:3px 20px}
+  .fila{display:flex;gap:6px;padding:5px 0;border-bottom:1px solid #F0F0F0}
+  .lbl{font-weight:700;color:#374151;min-width:140px;flex-shrink:0;font-size:11px}.val{color:#111;font-size:12px}
+  .conv{background:#F4F6FA;border-radius:6px;padding:8px 10px;margin-bottom:6px}
+  .nota{background:#FFFBEB;border-left:3px solid #D97706;padding:8px 10px;font-size:12px;margin-top:8px;border-radius:0 4px 4px 0}
+  .firmas{margin-top:36px;display:grid;grid-template-columns:1fr 1fr;gap:40px}
+  .firma-box{text-align:center}.firma-linea{border-bottom:1px solid #374151;margin-bottom:4px;height:40px}
+  .firma-label{font-size:11px;color:#6B7280}
+  .sello{border:1px solid #D1D5DB;border-radius:6px;padding:20px;text-align:center;font-size:11px;color:#9CA3AF;margin-top:8px}
+  .btn-p{background:#0369A1;color:#fff;border:none;border-radius:8px;padding:8px 18px;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:16px}
+  @media print{.btn-p{display:none}}</style></head><body>
+  <button class="btn-p" onclick="window.print()">🖨 Imprimir / Guardar PDF</button>
+  <div class="enc"><div><h1>INFORME SOCIOAMBIENTAL</h1><div class="sub">Área de Desarrollo Social · Municipalidad de Murphy, Santa Fe</div></div>
+  <div class="meta"><div style="font-weight:700">Fecha: ${fmtDateL(inf.fecha||hoy())}</div><div>Profesional: ${inf.profesional||"—"}</div></div></div>
+  <div class="sec">👤 Datos del solicitante</div>
+  <div class="grid">
+    <div class="fila"><span class="lbl">Nombre:</span><span class="val">${inf.nombre||"—"}</span></div>
+    <div class="fila"><span class="lbl">DNI:</span><span class="val">${inf.dni||"—"}</span></div>
+    <div class="fila"><span class="lbl">Fecha nacimiento:</span><span class="val">${inf.fechaNac?fmtDateL(inf.fechaNac):"—"}</span></div>
+    <div class="fila"><span class="lbl">Domicilio:</span><span class="val">${inf.domicilio||"—"}</span></div>
+    <div class="fila"><span class="lbl">Obra social:</span><span class="val">${inf.obraSocial||"—"}</span></div>
+    <div class="fila"><span class="lbl">Ocupación:</span><span class="val">${inf.ocupacion||"—"}</span></div>
+    <div class="fila"><span class="lbl">Educación:</span><span class="val">${inf.educacion||"—"}</span></div>
+    ${inf.titulo?`<div class="fila"><span class="lbl">Título:</span><span class="val">${inf.titulo}</span></div>`:""}
+    <div class="fila"><span class="lbl">Trabajo:</span><span class="val">${inf.trabajo||"—"}</span></div>
+    <div class="fila"><span class="lbl">Remuneración:</span><span class="val">${inf.remuneracion||"—"}</span></div>
+  </div>
+  ${conv.length>0?`<div class="sec">👨‍👩‍👧 Grupo familiar</div>${conv.map(c=>`<div class="conv"><div style="font-weight:700;font-size:13px">${c.nombre||"—"}</div><div style="font-size:11px;color:#6B7280;margin-top:3px;display:flex;gap:12px;flex-wrap:wrap">${c.dni?`<span>DNI: ${c.dni}</span>`:""}${c.fechaNac?`<span>Nac: ${fmtDateL(c.fechaNac)}</span>`:""}${c.ocupacion?`<span>${c.ocupacion}</span>`:""}${c.ingresos?`<span>$${c.ingresos}</span>`:""}</div></div>`).join("")}`:""}
+  <div class="sec">🏥 Situación de salud</div>
+  <div class="grid">
+    <div class="fila"><span class="lbl">¿Posee CUD?</span><span class="val">${inf.saludCud||"—"}</span></div>
+    <div class="fila"><span class="lbl">Enf. crónica:</span><span class="val">${inf.saludCronica||"—"}</span></div>
+    ${inf.saludCronicaDetalle?`<div class="fila" style="grid-column:1/-1"><span class="lbl">Detalle:</span><span class="val">${inf.saludCronicaDetalle}</span></div>`:""}
+    <div class="fila"><span class="lbl">Medicación:</span><span class="val">${inf.saludMedicacion||"—"}</span></div>
+    ${inf.saludMedicacionDetalle?`<div class="fila" style="grid-column:1/-1"><span class="lbl">Detalle:</span><span class="val">${inf.saludMedicacionDetalle}</span></div>`:""}
+    <div class="fila" style="grid-column:1/-1"><span class="lbl">Controles en:</span><span class="val">${inf.saludControles||"—"}</span></div>
+  </div>
+  <div class="sec">🏠 Situación habitacional</div>
+  <div class="grid">
+    <div class="fila"><span class="lbl">Tipo:</span><span class="val">${inf.vivTipo||"—"}</span></div>
+    <div class="fila"><span class="lbl">Habitaciones:</span><span class="val">${inf.vivHabitaciones||"—"}</span></div>
+    <div class="fila"><span class="lbl">Baño interior:</span><span class="val">${inf.vivBanio||"—"}</span></div>
+    <div class="fila"><span class="lbl">Habitabilidad:</span><span class="val">${inf.vivEstado||"—"}</span></div>
+    <div class="fila"><span class="lbl">Gas:</span><span class="val">${inf.vivGas||"—"}</span></div>
+    <div class="fila"><span class="lbl">Electricidad:</span><span class="val">${inf.vivElectricidad||"—"}</span></div>
+    <div class="fila"><span class="lbl">Internet:</span><span class="val">${inf.vivInternet||"—"}</span></div>
+    <div class="fila"><span class="lbl">Agua potable:</span><span class="val">${inf.vivAgua||"—"}</span></div>
+    <div class="fila"><span class="lbl">Calefacción:</span><span class="val">${inf.vivCalefaccion||"—"}</span></div>
+    <div class="fila"><span class="lbl">Mobiliario:</span><span class="val">${inf.vivMobiliario||"—"}</span></div>
+    <div class="fila" style="grid-column:1/-1"><span class="lbl">¿Vivienda adecuada?</span><span class="val">${inf.vivAdecuada||"—"}</span></div>
+  </div>
+  ${inf.consideraciones?`<div class="nota"><strong>Consideraciones:</strong><br>${inf.consideraciones}</div>`:""}
+  <div class="firmas">
+    <div class="firma-box"><div class="firma-linea"></div><div class="firma-label">Firma y sello del profesional<br>${inf.profesional||""}</div></div>
+    <div class="firma-box"><div class="firma-linea"></div><div class="firma-label">Firma del solicitante<br>${inf.nombre||""}</div></div>
+  </div>
+  <div class="sello">Sello institucional</div>
+  <div style="margin-top:16px;border-top:1px solid #E4E8F0;padding-top:10px;font-size:10px;color:#9CA3AF;text-align:center">Área de Desarrollo Social · Municipalidad de Murphy, Santa Fe, CP 2601 · ${fmtDateL(hoy())}</div>
+  </body></html>`;
+  const w=window.open("","_blank"); w.document.write(doc); w.document.close();
+}
+
 // ═══════════════════════════════════════════════════════
 // BIND EVENTS
 // ═══════════════════════════════════════════════════════
@@ -1570,68 +1849,6 @@ if("serviceWorker" in navigator){
   const swBlob = new Blob([swCode],{type:"application/javascript"});
   const swUrl = URL.createObjectURL(swBlob);
   navigator.serviceWorker.register(swUrl).catch(()=>{});
-}
-
-
-// ═══════════════════════════════════════════════════════
-// GOOGLE SHEETS SYNC
-// ═══════════════════════════════════════════════════════
-const SHEETS_URL = "https://script.google.com/macros/s/AKfycbzCiOJMZCjkF1o77ArzCLPiZX-0o50uwWjJGjMVdy-H9Pps766mOkrYgti_7hbwl1UC/exec";
-
-async function cargarDatos() {
-  showLoading(true);
-  try {
-    const tabs = ["usuarios","intervenciones","atenciones","reuniones","eventos"];
-    const results = await Promise.all(tabs.map(tab =>
-      fetch(SHEETS_URL + "?tab=" + tab).then(r => r.json()).catch(() => [])
-    ));
-    STATE.usuarios       = results[0].map(normalizar) || [];
-    STATE.intervenciones = results[1].map(normalizar) || [];
-    STATE.atenciones     = results[2].map(normalizar) || [];
-    STATE.reuniones      = results[3].map(r => ({...normalizar(r), participantes: parseLista(r.participantes), situaciones: parseLista(r.situaciones)})) || [];
-    STATE.eventos        = results[4].map(normalizar) || [];
-    showLoading(false);
-    render();
-  } catch(e) {
-    showLoading(false);
-    console.error("Error cargando datos:", e);
-    render();
-  }
-}
-
-function normalizar(obj) {
-  const r = {};
-  for(const k in obj) {
-    const v = obj[k];
-    if(k === "id" || k === "usuarioId" || k === "intervencionId" || k === "duracion") r[k] = Number(v)||0;
-    else r[k] = v === undefined || v === null ? "" : String(v);
-  }
-  return r;
-}
-
-function parseLista(val) {
-  if(!val || val === "") return [];
-  try { return JSON.parse(val); } catch { return []; }
-}
-
-async function syncSheet(tab, action, data, id) {
-  try {
-    // Serialize arrays to JSON strings for Sheets
-    const d = data ? {...data} : null;
-    if(d && d.participantes) d.participantes = JSON.stringify(d.participantes||[]);
-    if(d && d.situaciones)   d.situaciones   = JSON.stringify(d.situaciones||[]);
-    await fetch(SHEETS_URL, {
-      method: "POST",
-      body: JSON.stringify({tab, action, data: d, id})
-    });
-  } catch(e) {
-    console.error("Error sync:", e);
-  }
-}
-
-function showLoading(show) {
-  const el = document.getElementById("loading-overlay");
-  if(el) el.style.display = show ? "flex" : "none";
 }
 
 // ═══════════════════════════════════════════════════════
