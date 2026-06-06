@@ -297,7 +297,6 @@ function buildInicio(){
     {id:"mapa",icon:"🗺",label:"Mapa",color:"#059669",val:null,sub:"territorial"},
     {id:"calendario",icon:"🗓",label:"Calendario",color:"#DC2626",val:null,sub:"del equipo"},
   ];
-  const minHoy = atenHoy.reduce((s,a)=>s+(Number(a.duracion)||0),0);
   return `
     <div style="display:flex;gap:10px;margin-bottom:16px">
       <div style="flex:1;background:#EFF4FF;border-radius:14px;padding:12px 14px">
