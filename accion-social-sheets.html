@@ -293,10 +293,6 @@ function buildInicio(){
     {id:"calendario",icon:"🗓",label:"Calendario",color:"#DC2626",val:null,sub:"del equipo"},
     {id:"informe",icon:"📝",label:"Informes",color:"#0369A1",val:null,sub:"socioambientales"},
   ];
-    {id:"institucional",icon:"🏛",label:"Institucional",color:"#0891B2",val:null,sub:"reuniones"},
-    {id:"mapa",icon:"🗺",label:"Mapa",color:"#059669",val:null,sub:"territorial"},
-    {id:"calendario",icon:"🗓",label:"Calendario",color:"#DC2626",val:null,sub:"del equipo"},
-  ];
   return `
     <div style="display:flex;gap:10px;margin-bottom:16px">
       <div style="flex:1;background:#EFF4FF;border-radius:14px;padding:12px 14px">
@@ -503,7 +499,7 @@ function buildIntervenciones(){
                   ${i.subCategoria?Badge(i.subCategoria,"#F3F4F6","#6B7280"):""}
                 </div>
                 <div style="font-size:12px;color:#6B7280;display:flex;gap:12px">
-                  <span>👤 ${esc(u?.nombre||"—")}</span><span>📋 ${nA} aten.</span>
+                  <span>👤 ${esc((u&&u.nombre)||"—")}</span><span>📋 ${nA} aten.</span>
                 </div>
               </div>
               <span style="color:#9CA3AF;font-size:20px;align-self:center">›</span>
@@ -529,7 +525,7 @@ function buildIntervencionDetalle(){
           ${CatChip(i.categoria)}
           ${i.subCategoria?Badge(i.subCategoria,"#F3F4F6","#6B7280"):""}
         </div>
-        ${[["Usuario",u?.nombre||"—"],["Profesional",i.profesional||"—"],["Fecha",fmtDate(i.fechaInicio)]].map(([k,v])=>`
+        ${[["Usuario",(u&&u.nombre)||"—"],["Profesional",i.profesional||"—"],["Fecha",fmtDate(i.fechaInicio)]].map(([k,v])=>`
           <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #E4E8F0">
             <span style="font-size:12px;color:#6B7280;font-weight:600">${k}</span>
             <span style="font-size:13px;font-weight:700">${esc(v)}</span>
@@ -1106,7 +1102,7 @@ function getFormValues(){
 
 function guardarUsuario(){
   const v = getFormValues();
-  if(!v.nombre?.trim()) return alert("El nombre es obligatorio");
+  if(!v.nombre&&v.nombre.trim()) return alert("El nombre es obligatorio");
   const f = {...STATE.form,...v};
   if(f.id){
     STATE.usuarios = STATE.usuarios.map(u=>u.id==f.id?f:u);
@@ -1126,7 +1122,7 @@ function eliminarUsuario(id){
 
 function guardarIntervencion(){
   const v = getFormValues();
-  if(!v.titulo?.trim()) return alert("El título es obligatorio");
+  if(!v.titulo&&v.titulo.trim()) return alert("El título es obligatorio");
   const f = {...STATE.form,...v,usuarioId:Number(STATE.form.usuarioId)||0};
   delete f._busqModo; delete f._busqQ;
   if(f.id){
@@ -1146,7 +1142,7 @@ function eliminarIntervencion(id){
 
 function guardarAtencion(){
   const v = getFormValues();
-  if(!v.descripcion?.trim()) return alert("La descripción es obligatoria");
+  if(!v.descripcion&&v.descripcion.trim()) return alert("La descripción es obligatoria");
   // Map intervención by title
   const intTitulo = v.intervencionId;
   const intObj = STATE.intervenciones.find(i=>i.titulo===intTitulo||i.id==intTitulo);
@@ -1168,7 +1164,7 @@ function eliminarAtencion(id){
 
 function guardarReunion(){
   const v = getFormValues();
-  if(!v.titulo?.trim()) return alert("El título es obligatorio");
+  if(!v.titulo&&v.titulo.trim()) return alert("El título es obligatorio");
   const f = {...STATE.form,...v};
   if(f.id){
     STATE.reuniones = STATE.reuniones.map(r=>r.id==f.id?f:r);
@@ -1186,7 +1182,7 @@ function eliminarReunion(id){
 }
 
 function addParticipante(){
-  const nombre = STATE.partNombre.trim() || (document.getElementById("inp_partNombre")||{}).value?.trim();
+  const nombre = STATE.partNombre.trim() || (document.getElementById("inp_partNombre")||{}).value.trim();
   if(!nombre) return;
   const parts = [...(STATE.form.participantes||[]),{nombre}];
   setState({form:{...STATE.form,participantes:parts},partNombre:""});
@@ -1198,8 +1194,8 @@ function removeParticipante(idx){
 }
 
 function addSituacion(){
-  const nombre = STATE.sitNombre.trim() || (document.getElementById("inp_sitNombre")||{}).value?.trim();
-  const dni    = STATE.sitDni.trim()    || (document.getElementById("inp_sitDni")||{}).value?.trim();
+  const nombre = STATE.sitNombre.trim() || (document.getElementById("inp_sitNombre")||{}).value.trim();
+  const dni    = STATE.sitDni.trim()    || (document.getElementById("inp_sitDni")||{}).value.trim();
   if(!nombre) return;
   const match = dni ? STATE.usuarios.find(u=>u.dni===dni) : null;
   const sits = [...(STATE.form.situaciones||[]),{nombre,dni,usuarioId:match?match.id:null}];
@@ -1213,7 +1209,7 @@ function removeSituacion(idx){
 
 function guardarEvento(){
   const v = getFormValues();
-  if(!v.titulo?.trim()) return alert("El título es obligatorio");
+  if(!v.titulo&&v.titulo.trim()) return alert("El título es obligatorio");
   const f = {...STATE.form,...v};
   if(f.id){
     STATE.eventos = STATE.eventos.map(e=>e.id==f.id?f:e);
@@ -1266,7 +1262,7 @@ function imprimirAtencionesDia(){
     const cc=i?(CAT_COLORS[i.categoria]||"#6B7280"):"#6B7280";
     doc+=`<div class="atencion">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
-        <div><div class="nombre">${u?.nombre||"—"}</div>${u?.dni?`<div style="font-size:11px;color:#6B7280">DNI: ${u.dni}</div>`:""}</div>
+        <div><div class="nombre">${(u&&u.nombre)||"—"}</div>${(u&&u.dni)?`<div style="font-size:11px;color:#6B7280">DNI: ${u.dni}</div>`:""}</div>
         <div style="font-size:12px;color:#6B7280;text-align:right"><div style="font-weight:700">${a.profesional||"—"}</div></div>
       </div>
       <div class="badges">
@@ -1525,7 +1521,7 @@ function buildInformes(){
         return SCard(`<div style="display:flex;gap:12px;align-items:flex-start">
           <div style="width:44px;height:44px;border-radius:12px;background:#EFF4FF;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">📝</div>
           <div style="flex:1;min-width:0">
-            <div style="font-weight:800;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:3px">${esc(u?.nombre||inf.nombre||"Sin nombre")}</div>
+            <div style="font-weight:800;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:3px">${esc((u&&u.nombre)||inf.nombre||"Sin nombre")}</div>
             <div style="font-size:12px;color:#6B7280;display:flex;gap:10px;flex-wrap:wrap">
               ${inf.dni?`<span>🪪 ${esc(inf.dni)}</span>`:""}
               ${inf.fecha?`<span>📅 ${fmtDate(inf.fecha)}</span>`:""}
@@ -1576,9 +1572,9 @@ function buildSheetInforme(){
     <div class="field"><label>Vincular con usuario registrado (opcional)</label>
       ${selU?`<div style="display:flex;align-items:center;gap:10px;background:#EFF4FF;border:1.5px solid #2563EB;border-radius:10px;padding:9px 14px;margin-bottom:6px"><div style="flex:1"><div style="font-weight:800;font-size:14px">${esc(selU.nombre)}</div><div style="font-size:11px;color:#2563EB">DNI: ${esc(selU.dni||"—")}</div></div><button onclick="setState({form:{...STATE.form,usuarioId:''}})" style="background:none;border:none;color:#6B7280;font-size:18px;cursor:pointer">×</button></div>`:`<select onchange="setState({form:{...STATE.form,usuarioId:this.value}})" style="background:#F9FAFB;border:1.5px solid #E4E8F0;border-radius:10px;color:#111827;padding:10px 12px;font-size:14px;width:100%;font-family:Nunito,sans-serif;margin-bottom:6px"><option value="">Sin vinculación / cargar manualmente</option>${STATE.usuarios.map(u=>`<option value="${u.id}" ${f.usuarioId==u.id?"selected":""}>${esc(u.nombre)} — DNI: ${esc(u.dni||"—")}</option>`).join("")}</select>`}
     </div>
-    ${Field("Nombre y apellido *","f_nombre","text",f.nombre||selU?.nombre||"","",true)}
-    <div class="grid2">${Field("DNI","f_dni","text",f.dni||selU?.dni||"")}${Field("Fecha de nacimiento","f_fechaNac","date",f.fechaNac||selU?.fechaNac||"")}</div>
-    ${Field("Domicilio actual","f_domicilio","text",f.domicilio||selU?.direccion||"")}
+    ${Field("Nombre y apellido *","f_nombre","text",f.nombre||(selU&&selU.nombre)||"","",true)}
+    <div class="grid2">${Field("DNI","f_dni","text",f.dni||(selU&&selU.dni)||"")}${Field("Fecha de nacimiento","f_fechaNac","date",f.fechaNac||(selU&&selU.fechaNac)||"")}</div>
+    ${Field("Domicilio actual","f_domicilio","text",f.domicilio||(selU&&selU.direccion)||"")}
     <div class="grid2">${Field("Obra social","f_obraSocial","text",f.obraSocial||"")}${Field("Ocupación","f_ocupacion","text",f.ocupacion||"")}</div>
     ${Field("Nivel educativo","f_educacion","text",f.educacion||"",eduOpts)}
     ${(f.educacion||"").includes("completo")&&(f.educacion||"").includes("Terciario")?Field("Título obtenido","f_titulo","text",f.titulo||""):""}
@@ -1647,7 +1643,7 @@ function removeConviviente(idx){
 
 function guardarInforme(){
   const v=getFormValues();
-  if(!v.nombre?.trim()) return alert("El nombre es obligatorio");
+  if(!v.nombre&&v.nombre.trim()) return alert("El nombre es obligatorio");
   const f={...STATE.form,...v};
   if(typeof f.convivientes!=="string") f.convivientes=JSON.stringify(f.convivientes||[]);
   if(f.id){
