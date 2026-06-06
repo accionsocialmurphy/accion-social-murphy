@@ -477,7 +477,7 @@ function buildIntervenciones(){
     <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px">
       <div style="flex:1;position:relative">
         <span style="position:absolute;left:11px;top:50%;transform:translateY(-50%);font-size:14px;color:#9CA3AF">🔎</span>
-        <input value="${esc(STATE.searchInt||'')" oninput="setState({searchInt:this.value})" placeholder="Buscar por nombre o intervención…"
+        <input value="${esc(STATE.searchInt||'')}" oninput="setState({searchInt:this.value})" placeholder="Buscar por nombre o intervención…"
           style="width:100%;background:#fff;border:1.5px solid ${STATE.searchInt?'#2563EB':'#E4E8F0'};border-radius:10px;padding:9px 12px 9px 34px;font-size:14px;color:#111827;font-family:Nunito,sans-serif">
       </div>
       <button onclick="openSheet('intervencionNueva')" class="btn btn-primary tap">+ Nueva</button>
