@@ -284,13 +284,15 @@ function toggleMenu(){ setState({menuOpen:!STATE.menuOpen}); }
 // INICIO
 // ═══════════════════════════════════════════════════════
 function buildInicio(){
-  const atenHoy = STATE.atenciones.filter(a=>a.fecha===hoy());
   const secciones = [
     {id:"usuarios",icon:"👥",label:"Usuarios",color:"#2563EB",val:STATE.usuarios.length,sub:"registrados"},
     {id:"intervenciones",icon:"📋",label:"Intervenciones",color:"#059669",val:STATE.intervenciones.length,sub:"totales"},
-    {id:"atenciones",icon:"📅",label:"Atenciones",color:"#D97706",val:atenHoy.length,sub:"hoy"},
     {id:"legajo",icon:"📂",label:"Legajo",color:"#DC2626",val:null,sub:"buscar y descargar"},
-    {id:"seguimiento",icon:"🔍",label:"Seguimiento",color:"#7C3AED",val:STATE.intervenciones.length,sub:"en curso"},
+    {id:"institucional",icon:"🏛",label:"Institucional",color:"#0891B2",val:null,sub:"reuniones"},
+    {id:"mapa",icon:"🗺",label:"Mapa",color:"#059669",val:null,sub:"territorial"},
+    {id:"calendario",icon:"🗓",label:"Calendario",color:"#DC2626",val:null,sub:"del equipo"},
+    {id:"informe",icon:"📝",label:"Informes",color:"#0369A1",val:null,sub:"socioambientales"},
+  ];
     {id:"institucional",icon:"🏛",label:"Institucional",color:"#0891B2",val:null,sub:"reuniones"},
     {id:"mapa",icon:"🗺",label:"Mapa",color:"#059669",val:null,sub:"territorial"},
     {id:"calendario",icon:"🗓",label:"Calendario",color:"#DC2626",val:null,sub:"del equipo"},
@@ -299,16 +301,16 @@ function buildInicio(){
   return `
     <div style="display:flex;gap:10px;margin-bottom:16px">
       <div style="flex:1;background:#EFF4FF;border-radius:14px;padding:12px 14px">
-        <div style="font-size:22px;font-weight:800;color:#2563EB">${atenHoy.length}</div>
-        <div style="font-size:11px;font-weight:600;color:#2563EB;opacity:.8">Atenciones hoy</div>
+        <div style="font-size:22px;font-weight:800;color:#2563EB">${STATE.usuarios.length}</div>
+        <div style="font-size:11px;font-weight:600;color:#2563EB;opacity:.8">Usuarios</div>
       </div>
       <div style="flex:1;background:#ECFDF5;border-radius:14px;padding:12px 14px">
-        <div style="font-size:22px;font-weight:800;color:#059669">${minHoy} min</div>
-        <div style="font-size:11px;font-weight:600;color:#059669;opacity:.8">Tiempo total</div>
+        <div style="font-size:22px;font-weight:800;color:#059669">${STATE.intervenciones.length}</div>
+        <div style="font-size:11px;font-weight:600;color:#059669;opacity:.8">Intervenciones</div>
       </div>
       <div style="flex:1;background:#F5F3FF;border-radius:14px;padding:12px 14px">
-        <div style="font-size:22px;font-weight:800;color:#7C3AED">${STATE.usuarios.length}</div>
-        <div style="font-size:11px;font-weight:600;color:#7C3AED;opacity:.8">Usuarios</div>
+        <div style="font-size:22px;font-weight:800;color:#7C3AED">${STATE.reuniones.length}</div>
+        <div style="font-size:11px;font-weight:600;color:#7C3AED;opacity:.8">Reuniones</div>
       </div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
