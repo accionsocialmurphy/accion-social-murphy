@@ -469,7 +469,9 @@ function buildSheetUsuario(){
 // ═══════════════════════════════════════════════════════
 function buildIntervenciones(){
   if(STATE.detail && STATE.tab==="intervenciones") return buildIntervencionDetalle();
-  const filtered = STATE.intervenciones.filter(i=>!STATE.filtCat||i.categoria===STATE.filtCat);
+  const filtered = STATE.intervenciones
+    .filter(i=>(!STATE.filtCat||i.categoria===STATE.filtCat)&&(!STATE.searchInt||(i.titulo||"").toLowerCase().includes(STATE.searchInt.toLowerCase())||((STATE.usuarios.find(u=>u.id==i.usuarioId)||{}).nombre||"").toLowerCase().includes(STATE.searchInt.toLowerCase())))
+    .sort((a,b)=>(b.fechaInicio||"").localeCompare(a.fechaInicio||""));
   return `
     <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px">
       <div style="flex:1;position:relative">
@@ -480,34 +482,189 @@ function buildIntervenciones(){
       <button onclick="openSheet('intervencionNueva')" class="btn btn-primary tap">+ Nueva</button>
     </div>
     <div style="font-size:12px;color:#6B7280;font-weight:600;margin-bottom:10px">${filtered.length} intervenciones</div>
-    <div class="hscroll" style="margin-bottom:14px">
+    <button onclick="openSheet('imprimirIntervenciones')" class="btn btn-full tap" style="background:#1e3a5f;color:#fff;border:none;margin-bottom:12px">🖨 Descargar intervenciones en PDF</button>
+
+    <div class="hscroll" style="margin-bottom:12px">
       <button onclick="setState({filtCat:''})" class="pill ${!STATE.filtCat?'active':'inactive'} tap">Todas</button>
-      ${CATS.map(c=>`<button onclick="setState({filtCat:STATE.filtCat==='${c}'?'':'${c}'})" class="pill ${STATE.filtCat===c?'active':'inactive'} tap" style="${STATE.filtCat===c?`background:${catColor(c)}`:''};">${c}</button>`).join("")}
+      ${CATS.map(c=>`<button onclick="setState({filtCat:STATE.filtCat==='${c}'?'':'${c}'})" class="tap"
+        style="border:none;border-radius:20px;padding:5px 14px;font-size:12px;font-weight:600;white-space:nowrap;cursor:pointer;font-family:Nunito,sans-serif;background:${STATE.filtCat===c?catColor(c):'#F1F5F9'};color:${STATE.filtCat===c?'#fff':'#6B7280'}">
+        ${c}
+      </button>`).join("")}
     </div>
     <div style="display:flex;flex-direction:column;gap:8px">
-      ${filtered.length===0?SCard('<p style="color:#9CA3AF;text-align:center;font-size:13px">Sin resultados</p>'):
-        filtered.map(i=>{
-          const u = STATE.usuarios.find(u=>u.id===i.usuarioId);
-          const nA = STATE.atenciones.filter(a=>a.intervencionId===i.id).length;
-          return SCard(`
-            <div style="display:flex;gap:12px;align-items:flex-start">
-              <div style="width:4px;border-radius:4px;align-self:stretch;background:${catColor(i.categoria)};flex-shrink:0;min-height:50px"></div>
-              <div style="flex:1;min-width:0">
-                <div style="font-weight:800;font-size:14px;margin-bottom:5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(i.titulo)}</div>
-                <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px">
-                  ${CatChip(i.categoria)}
-                  ${i.subCategoria?Badge(i.subCategoria,"#F3F4F6","#6B7280"):""}
-                </div>
-                <div style="font-size:12px;color:#6B7280;display:flex;gap:12px">
-                  <span>👤 ${esc((u&&u.nombre)||"—")}</span><span>📋 ${nA} aten.</span>
-                </div>
+      ${filtered.length===0?SCard('<p style="color:#9CA3AF;text-align:center;font-size:13px">Sin resultados</p>'):""}
+      ${filtered.map(i=>{
+        const u=STATE.usuarios.find(u=>u.id==i.usuarioId);
+        const nA=STATE.atenciones.filter(a=>a.intervencionId==i.id).length;
+        return SCard(`
+          <div style="display:flex;gap:12px;align-items:flex-start">
+            <div style="width:4px;border-radius:4px;align-self:stretch;background:${catColor(i.categoria)};flex-shrink:0;min-height:50px"></div>
+            <div style="flex:1;min-width:0">
+              <div style="font-weight:800;font-size:14px;margin-bottom:5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(i.titulo||"—")}</div>
+              <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px">
+                ${CatChip(i.categoria)}
+                ${i.subCategoria?Badge(i.subCategoria,"#F3F4F6","#6B7280"):""}
               </div>
-              <span style="color:#9CA3AF;font-size:20px;align-self:center">›</span>
-            </div>`, "", `openDetalle('intervencion','${i.id}')`);
-        }).join("")}
+              <div style="font-size:12px;color:#6B7280;display:flex;gap:12px">
+                <span>👤 ${esc((u&&u.nombre)||"—")}</span><span>📋 ${nA} aten.</span><span>📅 ${fmtDate(i.fechaInicio)}</span>
+              </div>
+            </div>
+            <span style="color:#9CA3AF;font-size:20px;align-self:center">›</span>
+          </div>`, "", `openDetalle('intervencion','${i.id}')`);
+      }).join("")}
     </div>
-    ${STATE.sheet ? buildSheetIntervencion() : ""}`;
+    ${STATE.sheet==="imprimirIntervenciones" ? buildSheetImprimirInterv() : ""}
+    ${STATE.sheet && STATE.sheet!=="imprimirIntervenciones" ? buildSheetIntervencion() : ""}`;
 }
+
+
+function buildSheetImprimirInterv(){
+  const f=STATE.form;
+  const hoyStr=hoy();
+  const getCount=(tipo,desde,hasta)=>{
+    let d=desde, h=hasta;
+    const now=new Date();
+    if(tipo==="hoy"){ d=hoyStr; h=hoyStr; }
+    else if(tipo==="semana"){ const x=new Date(now); x.setDate(x.getDate()-7); d=x.toISOString().slice(0,10); h=hoyStr; }
+    else if(tipo==="quincena"){ const x=new Date(now); x.setDate(x.getDate()-15); d=x.toISOString().slice(0,10); h=hoyStr; }
+    else if(tipo==="mes"){ const x=new Date(now); x.setDate(x.getDate()-30); d=x.toISOString().slice(0,10); h=hoyStr; }
+    else if(tipo==="trimestre"){ const x=new Date(now); x.setDate(x.getDate()-90); d=x.toISOString().slice(0,10); h=hoyStr; }
+    return STATE.intervenciones.filter(i=>{const fi=i.fechaInicio||""; return fi>=d&&fi<=h;}).length;
+  };
+  const tipo=f.filtroTipo||"rango";
+  const count=getCount(tipo, f.fechaDesde||"", f.fechaHasta||hoyStr);
+  const labels={hoy:"Hoy",semana:"Última semana",quincena:"Última quincena",mes:"Último mes",trimestre:"Último trimestre",rango:"Rango personalizado"};
+  return Sheet("Descargar intervenciones en PDF",`
+    <div style="background:#EFF4FF;border-radius:10px;padding:10px 14px;margin-bottom:16px;font-size:12px;color:#2563EB;font-weight:600">
+      📋 Cada intervención se imprime en una hoja separada para archivar en el legajo
+    </div>
+    <div style="font-size:12px;font-weight:700;color:#6B7280;margin-bottom:10px">Seleccioná el período</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
+      ${["hoy","semana","quincena","mes","trimestre","rango"].map(t=>`
+        <button onclick="setState({form:{...saveFormFields(),filtroTipo:'${t}'}})" class="tap"
+          style="padding:10px 8px;border-radius:10px;border:2px solid ${tipo===t?'#2563EB':'#E4E8F0'};background:${tipo===t?'#EFF4FF':'#fff'};color:${tipo===t?'#2563EB':'#6B7280'};font-weight:700;font-size:12px;cursor:pointer;font-family:Nunito,sans-serif;text-align:center">
+          ${labels[t]}
+        </button>`).join("")}
+    </div>
+    ${tipo==="rango"?`
+      <div class="grid2" style="margin-bottom:14px">
+        <div class="field"><label>Desde</label><input type="date" id="f_fechaDesde" value="${f.fechaDesde||""}" style="background:#F9FAFB;border:1.5px solid #E4E8F0;border-radius:10px;color:#111827;padding:10px 12px;font-size:14px;width:100%;font-family:Nunito,sans-serif"></div>
+        <div class="field"><label>Hasta</label><input type="date" id="f_fechaHasta" value="${f.fechaHasta||hoyStr}" style="background:#F9FAFB;border:1.5px solid #E4E8F0;border-radius:10px;color:#111827;padding:10px 12px;font-size:14px;width:100%;font-family:Nunito,sans-serif"></div>
+      </div>`:""}
+    <div style="background:#F4F6FA;border-radius:10px;padding:12px;text-align:center;margin-bottom:16px">
+      <div style="font-size:28px;font-weight:800;color:#2563EB">${count}</div>
+      <div style="font-size:12px;color:#6B7280">intervenciones encontradas</div>
+    </div>
+    <div style="display:flex;gap:10px">
+      <button onclick="closeSheet()" class="btn btn-ghost tap" style="flex:1;justify-content:center">Cancelar</button>
+      <button onclick="ejecutarImpresionInterv()" class="btn tap" style="flex:2;justify-content:center;background:#1e3a5f;color:#fff;border:none;font-weight:700">🖨 Generar PDF</button>
+    </div>`);
+}
+
+function ejecutarImpresionInterv(){
+  const f=STATE.form;
+  const hoyStr=hoy();
+  let desde="", hasta=hoyStr;
+  const now=new Date();
+  if(f.filtroTipo==="hoy"){ desde=hoyStr; hasta=hoyStr; }
+  else if(f.filtroTipo==="semana"){ const d=new Date(now); d.setDate(d.getDate()-7); desde=d.toISOString().slice(0,10); }
+  else if(f.filtroTipo==="quincena"){ const d=new Date(now); d.setDate(d.getDate()-15); desde=d.toISOString().slice(0,10); }
+  else if(f.filtroTipo==="mes"){ const d=new Date(now); d.setDate(d.getDate()-30); desde=d.toISOString().slice(0,10); }
+  else if(f.filtroTipo==="trimestre"){ const d=new Date(now); d.setDate(d.getDate()-90); desde=d.toISOString().slice(0,10); }
+  else {
+    desde=(document.getElementById("f_fechaDesde")||{}).value||f.fechaDesde||"";
+    hasta=(document.getElementById("f_fechaHasta")||{}).value||f.fechaHasta||hoyStr;
+  }
+  const intervs=STATE.intervenciones.filter(i=>{const fi=i.fechaInicio||""; return fi>=desde&&fi<=hasta;}).sort((a,b)=>(a.fechaInicio||"").localeCompare(b.fechaInicio||""));
+  if(!intervs.length) return alert("No hay intervenciones en el período seleccionado.");
+  imprimirIntervencionesPDF(intervs, desde, hasta);
+  closeSheet();
+}
+
+function imprimirIntervencionesPDF(intervs, desde, hasta){
+  const fL=d=>d?new Date(d+"T12:00").toLocaleDateString("es-ES",{day:"2-digit",month:"long",year:"numeric"}):"—";
+  let paginas="";
+  intervs.forEach((i,idx)=>{
+    const u=STATE.usuarios.find(u=>u.id==i.usuarioId);
+    const ates=STATE.atenciones.filter(a=>a.intervencionId==i.id).sort((a,b)=>b.fecha.localeCompare(a.fecha));
+    const cc=CAT_COLORS[i.categoria]||"#6B7280";
+    const atesHTML=ates.map(a=>`<div class="atencion">
+      <div class="aten-header">
+        <span class="badge">${fL(a.fecha)}</span>
+        <span class="badge gray">${a.tipo||""}</span>
+        <span class="badge gray">${a.duracion||0} min</span>
+        <span class="badge gray">&#129489; ${a.profesional||""}</span>
+      </div>
+      <div class="texto">${a.descripcion||""}</div>
+      ${a.accionesSiguientes?`<div class="accion">&#8594; ${a.accionesSiguientes}</div>`:""}
+    </div>`).join("");
+    paginas+=`<div class="pagina">
+      <div class="enc">
+        <div><div class="enc-titulo">REGISTRO DE INTERVENCI&#211;N</div>
+        <div class="enc-sub">&#193;rea de Desarrollo Social &middot; Municipalidad de Murphy, Santa Fe</div></div>
+        <div class="enc-num">#${idx+1} de ${intervs.length}</div>
+      </div>
+      <div class="sec">&#128100; Datos del usuario</div>
+      <div class="grid">
+        <div class="fila"><span class="lbl">Nombre:</span><span>${(u&&u.nombre)||"—"}</span></div>
+        <div class="fila"><span class="lbl">DNI:</span><span>${(u&&u.dni)||"—"}</span></div>
+        <div class="fila"><span class="lbl">Tel&#233;fono:</span><span>${(u&&u.telefono)||"—"}</span></div>
+        <div class="fila"><span class="lbl">Direcci&#243;n:</span><span>${(u&&u.direccion)||"—"}</span></div>
+      </div>
+      <div class="sec">&#128203; Datos de la intervenci&#243;n</div>
+      <div class="grid">
+        <div class="fila"><span class="lbl">T&#237;tulo:</span><span>${i.titulo||"—"}</span></div>
+        <div class="fila"><span class="lbl">Categor&#237;a:</span><span class="cat" style="background:${cc}22;color:${cc}">${i.categoria||"—"}</span></div>
+        ${i.subCategoria?`<div class="fila"><span class="lbl">Subcategor&#237;a:</span><span>${i.subCategoria}</span></div>`:""}
+        <div class="fila"><span class="lbl">Fecha inicio:</span><span>${fL(i.fechaInicio)}</span></div>
+        <div class="fila"><span class="lbl">Profesional:</span><span>${i.profesional||"—"}</span></div>
+      </div>
+      ${i.descripcion?`<div class="sec">&#128221; Descripci&#243;n</div><div class="texto">${i.descripcion}</div>`:""}
+      ${ates.length>0?`<div class="sec">&#128197; Historial de atenciones (${ates.length})</div>${atesHTML}`:""}
+      <div class="firmas">
+        <div class="firma-box"><div class="firma-linea"></div><div class="firma-label">Firma del profesional<br>${i.profesional||""}</div></div>
+        <div class="firma-box"><div class="firma-linea"></div><div class="firma-label">Firma del usuario / responsable<br>${(u&&u.nombre)||""}</div></div>
+      </div>
+      <div class="footer">Equipo de Acci&#243;n Social &middot; Murphy, Santa Fe, CP 2601 &middot; ${fL(hoy())}</div>
+    </div>`;
+  });
+
+  const doc=`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8">
+  <title>Intervenciones ${fL(desde)} al ${fL(hasta)}</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:Arial,sans-serif;font-size:12px;color:#111;background:#fff}
+    .pagina{padding:28px 36px;max-width:800px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;page-break-after:always}
+    .pagina:last-child{page-break-after:auto}
+    .enc{border-bottom:3px solid #1e3a5f;padding-bottom:12px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:flex-start}
+    .enc-titulo{font-size:18px;font-weight:700;color:#1e3a5f}
+    .enc-sub{font-size:11px;color:#6B7280;margin-top:2px}
+    .enc-num{font-size:13px;font-weight:700;color:#6B7280;white-space:nowrap}
+    .sec{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:#6B7280;background:#F4F6FA;padding:4px 10px;border-radius:5px;margin:14px 0 8px}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:2px 16px}
+    .fila{display:flex;gap:6px;padding:4px 0;border-bottom:1px solid #F0F0F0;font-size:12px}
+    .lbl{font-weight:700;color:#374151;min-width:100px;flex-shrink:0}
+    .cat{border-radius:10px;padding:1px 8px;font-size:11px;font-weight:700}
+    .texto{font-size:12px;line-height:1.6;color:#374151;padding:6px 0}
+    .atencion{border:1px solid #E4E8F0;border-radius:6px;padding:8px 10px;margin-bottom:6px}
+    .aten-header{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:5px}
+    .badge{background:#EFF4FF;color:#2563EB;border-radius:10px;padding:1px 8px;font-size:11px;font-weight:700}
+    .badge.gray{background:#F3F4F6;color:#6B7280}
+    .accion{background:#FFFBEB;border-left:3px solid #D97706;padding:5px 8px;font-size:11px;color:#92400e;margin-top:5px;border-radius:0 4px 4px 0}
+    .firmas{margin-top:auto;padding-top:20px;display:grid;grid-template-columns:1fr 1fr;gap:40px}
+    .firma-box{text-align:center}
+    .firma-linea{border-bottom:1px solid #374151;margin-bottom:4px;height:36px}
+    .firma-label{font-size:10px;color:#6B7280}
+    .footer{text-align:center;font-size:10px;color:#9CA3AF;padding-top:10px;margin-top:8px;border-top:1px solid #E4E8F0}
+    .btn-p{background:#1e3a5f;color:#fff;border:none;border-radius:8px;padding:8px 18px;font-size:13px;font-weight:700;cursor:pointer;margin:16px auto;display:block}
+    @media print{.btn-p{display:none}.pagina{padding:16px 24px}}
+  </style></head><body>
+  <button class="btn-p" onclick="window.print()">&#128424; Imprimir / Guardar PDF</button>
+  ${paginas}
+  </body></html>`;
+  const w=window.open("","_blank"); w.document.write(doc); w.document.close();
+}
+
 
 function buildIntervencionDetalle(){
   const i = STATE.intervenciones.find(x=>x.id==STATE.detail);
