@@ -1531,19 +1531,50 @@ function imprimirLegajo(uid){
 const SHEETS_URL = "https://script.google.com/macros/s/AKfycbzCiOJMZCjkF1o77ArzCLPiZX-0o50uwWjJGjMVdy-H9Pps766mOkrYgti_7hbwl1UC/exec";
 
 async function cargarDatos(){
-  showLoading(true);
+  // Cargar desde localStorage primero (instantáneo)
   try{
-    const tabs=["usuarios","intervenciones","atenciones","reuniones","eventos","informes"];
-    const results=await Promise.all(tabs.map(tab=>fetch(SHEETS_URL+"?tab="+tab).then(r=>r.json()).catch(()=>[])));
-    STATE.usuarios      =results[0].map(normalizar)||[];
-    STATE.intervenciones=results[1].map(normalizar)||[];
-    STATE.atenciones    =results[2].map(normalizar)||[];
-    STATE.reuniones     =results[3].map(r=>({...normalizar(r),participantes:parseLista(r.participantes),situaciones:parseLista(r.situaciones)})) ||[];
-    STATE.eventos       =results[4].map(normalizar)||[];
-    STATE.informes      =results[5].map(normalizar)||[];
+    const cache = localStorage.getItem("accion_social_cache");
+    if(cache){
+      const d = JSON.parse(cache);
+      STATE.usuarios       = d.usuarios||[];
+      STATE.intervenciones = d.intervenciones||[];
+      STATE.atenciones     = d.atenciones||[];
+      STATE.reuniones      = d.reuniones||[];
+      STATE.eventos        = d.eventos||[];
+      STATE.informes       = d.informes||[];
+      showLoading(false);
+      render();
+    } else {
+      showLoading(true);
+    }
+  }catch(e){}
+
+  // Actualizar desde Sheets en segundo plano
+  try{
+    const res = await fetch(SHEETS_URL+"?tab=all");
+    const data = await res.json();
+    if(data.error) throw new Error(data.error);
+    STATE.usuarios       = (data.usuarios||[]).map(normalizar);
+    STATE.intervenciones = (data.intervenciones||[]).map(normalizar);
+    STATE.atenciones     = (data.atenciones||[]).map(normalizar);
+    STATE.reuniones      = (data.reuniones||[]).map(r=>({...normalizar(r),participantes:parseLista(r.participantes),situaciones:parseLista(r.situaciones)}));
+    STATE.eventos        = (data.eventos||[]).map(normalizar);
+    STATE.informes       = (data.informes||[]).map(normalizar);
+    // Guardar en cache local
+    try{
+      localStorage.setItem("accion_social_cache", JSON.stringify({
+        usuarios:STATE.usuarios, intervenciones:STATE.intervenciones,
+        atenciones:STATE.atenciones, reuniones:STATE.reuniones,
+        eventos:STATE.eventos, informes:STATE.informes
+      }));
+    }catch(e){}
     showLoading(false);
     render();
-  }catch(e){showLoading(false);console.error("Error:",e);render();}
+  }catch(e){
+    showLoading(false);
+    console.error("Error cargando desde Sheets:",e);
+    render();
+  }
 }
 
 function normalizar(obj){
