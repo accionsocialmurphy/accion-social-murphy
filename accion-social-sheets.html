@@ -506,7 +506,7 @@ function buildSheetImprimirInterv(){
   const tipo=f.filtroTipo||"rango";
   const count=getCount(tipo, f.fechaDesde||"", f.fechaHasta||hoyStr);
   const labels={hoy:"Hoy",semana:"Última semana",quincena:"Última quincena",mes:"Último mes",trimestre:"Último trimestre",rango:"Rango personalizado"};
-const formato = f.formatoPdf || "hoja";
+  const formato = f.formatoPdf || "hoja";
   return Sheet("Descargar intervenciones en PDF",`
     <div style="font-size:12px;font-weight:700;color:#6B7280;margin-bottom:10px">Formato del PDF</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
