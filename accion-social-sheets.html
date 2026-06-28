@@ -563,7 +563,7 @@ function ejecutarImpresionInterv(){
   }
   const intervs=STATE.intervenciones.filter(i=>{const fi=i.fechaInicio||""; return fi>=desde&&fi<=hasta;}).sort((a,b)=>(a.fechaInicio||"").localeCompare(b.fechaInicio||""));
   if(!intervs.length) return alert("No hay intervenciones en el período seleccionado.");
-  imprimirIntervencionesPDF(intervs, desde, hasta);
+  imprimirIntervencionesPDF(intervs, desde, hasta, f.formatoPdf||"hoja");
   closeSheet();
 }
 
