@@ -567,7 +567,8 @@ function ejecutarImpresionInterv(){
   closeSheet();
 }
 
-function imprimirIntervencionesPDF(intervs, desde, hasta){
+function imprimirIntervencionesPDF(intervs, desde, hasta, formato){
+  const compacto = formato==="compacto";
   const fL=d=>d?new Date(d+"T12:00").toLocaleDateString("es-ES",{day:"2-digit",month:"long",year:"numeric"}):"—";
   let paginas="";
   intervs.forEach((i,idx)=>{
