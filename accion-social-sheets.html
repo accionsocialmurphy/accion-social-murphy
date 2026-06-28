@@ -1215,6 +1215,7 @@ function openSheet(tipo, id){
   if(tipo==="eventoEdit")        { const e=STATE.eventos.find(e=>e.id==id); form={...e}; }
   if(tipo==="informeNuevo")      form = {nombre:"",dni:"",fecha:hoy(),convivientes:[]};
   if(tipo==="informeEdit")       { const inf=(STATE.informes||[]).find(x=>x.id==id); form={...inf}; }
+  if(tipo==="imprimirIntervenciones") form = {filtroTipo:"rango",formatoPdf:"hoja",fechaDesde:"",fechaHasta:hoy()};
   setState({sheet:tipo,form});
 }
 
