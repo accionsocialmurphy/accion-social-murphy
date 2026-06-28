@@ -506,9 +506,23 @@ function buildSheetImprimirInterv(){
   const tipo=f.filtroTipo||"rango";
   const count=getCount(tipo, f.fechaDesde||"", f.fechaHasta||hoyStr);
   const labels={hoy:"Hoy",semana:"Última semana",quincena:"Última quincena",mes:"Último mes",trimestre:"Último trimestre",rango:"Rango personalizado"};
+const formato = f.formatoPdf || "hoja";
   return Sheet("Descargar intervenciones en PDF",`
+    <div style="font-size:12px;font-weight:700;color:#6B7280;margin-bottom:10px">Formato del PDF</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
+      <button onclick="setState({form:{...saveFormFields(),formatoPdf:'hoja'}})" class="tap"
+        style="padding:12px 8px;border-radius:10px;border:2px solid ${formato==='hoja'?'#2563EB':'#E4E8F0'};background:${formato==='hoja'?'#EFF4FF':'#fff'};color:${formato==='hoja'?'#2563EB':'#6B7280'};font-weight:700;font-size:12px;cursor:pointer;font-family:Nunito,sans-serif;display:flex;flex-direction:column;align-items:center;gap:4px">
+        <span style="font-size:20px">📄</span>Una por hoja
+        <span style="font-size:10px;font-weight:600;opacity:.8">Para archivar en legajo</span>
+      </button>
+      <button onclick="setState({form:{...saveFormFields(),formatoPdf:'compacto'}})" class="tap"
+        style="padding:12px 8px;border-radius:10px;border:2px solid ${formato==='compacto'?'#2563EB':'#E4E8F0'};background:${formato==='compacto'?'#EFF4FF':'#fff'};color:${formato==='compacto'?'#2563EB':'#6B7280'};font-weight:700;font-size:12px;cursor:pointer;font-family:Nunito,sans-serif;display:flex;flex-direction:column;align-items:center;gap:4px">
+        <span style="font-size:20px">📑</span>Todas seguidas
+        <span style="font-size:10px;font-weight:600;opacity:.8">Ahorra hojas</span>
+      </button>
+    </div>
     <div style="background:#EFF4FF;border-radius:10px;padding:10px 14px;margin-bottom:16px;font-size:12px;color:#2563EB;font-weight:600">
-      📋 Cada intervención se imprime en una hoja separada para archivar en el legajo
+      ${formato==='hoja'?'📋 Cada intervención se imprime en una hoja separada para archivar en el legajo':'📑 Todas las intervenciones van seguidas, una tras otra, para ahorrar hojas'}
     </div>
     <div style="font-size:12px;font-weight:700;color:#6B7280;margin-bottom:10px">Seleccioná el período</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
